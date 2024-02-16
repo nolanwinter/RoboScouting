@@ -1,13 +1,20 @@
 require "data"
 module("Objects", package.seeall)
 
+require "qrencode"
+--qrencode = QREncode
+--local qrencode = dofile("qrencode.lua")
+
+local show_debug_text = true
+
 local asset_loc = "Assets/"
 
-local function add_id(id)
+local function add_id_key(id,key)
     if Data.ids[id] then
         error("You cannot have two data objects sharing an id.", 3)
     else
         Data.ids[id] = true
+        Data.keys[id] = key
     end
 end
 
@@ -53,15 +60,12 @@ end
 
 
 Inc_Dec = {}
-function Inc_Dec.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, spac2, spac3, button_size, val_size, val_font_size, min_val, max_val)
+function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, spac3, button_size, val_size, val_font_size, min_val, max_val)
     local self = setmetatable({}, Inc_Dec)
     self.id_need = calcIDNeed(max_val)
     self.def_val = min_val
-    if Data.recorded_data[id] ~= Nil then -- this is actually currently unecessary since the scenes don't get destroyed... only hidden
-        self.def_val = getData(id, self.id_need)
-    end
     for i=0,self.id_need-1 do
-        add_id(id + i)
+        add_id_key(id + i,key)
         Data.recorded_data[id + i] = self.def_val
     end
     self.id_val = self.def_val
@@ -75,16 +79,11 @@ function Inc_Dec.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1
     self.id_plus.x=self.id_text.x + self.id_text.width + spac1
     self.id_plus.y=y_val
 
-    self.id_minus = display.newImageRect(sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
-    self.id_minus.anchorX=0
-    self.id_minus.x=self.id_plus.x + self.id_plus.width + spac2
-    self.id_minus.y=y_val
-
     local bkgd_height = math.max(self.id_text.height, button_size)
     self.id_val_bkgd = display.newRoundedRect(sceneGroup, 0, 0, val_size, 0, 12)
     self.id_val_bkgd.height=bkgd_height
     self.id_val_bkgd.anchorX=0
-    self.id_val_bkgd.x=self.id_minus.x + self.id_minus.width + spac3
+    self.id_val_bkgd.x=self.id_plus.x + self.id_plus.width + spac3
     self.id_val_bkgd.y=y_val
 
     self.id_val_text = display.newText({parent=sceneGroup,text=tostring(self.id_val),x=0,y=0,font=native.systemFont,fontSize=val_font_size})
@@ -92,6 +91,11 @@ function Inc_Dec.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1
     self.id_val_text.anchorX=0.5
     self.id_val_text.x = self.id_val_bkgd.x + (self.id_val_bkgd.width/2)
     self.id_val_text.y = self.id_val_bkgd.y
+
+    self.id_minus = display.newImageRect(sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
+    self.id_minus.anchorX=0
+    self.id_minus.x=self.id_val_bkgd.x + self.id_val_bkgd.width + spac2
+    self.id_minus.y=y_val
 
     self.tap_id_plus = function ()
         self.id_val = math.min(self.id_val + 1,max_val)
@@ -117,9 +121,9 @@ function Inc_Dec.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1
 end
 
 Radio = {}
-function Radio.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, spac2, label_size, spac_lbl, radio_size, colored, default_val)
+function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, label_size, spac_lbl, radio_size, colored, default_val)
     local self = setmetatable({}, Radio)
-    add_id(id)
+    add_id_key(id,key)
     Data.recorded_data[id] = (default_val and 1 or 0)
     --self.rad_val = default_val
 
@@ -206,7 +210,7 @@ function Radio.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, 
     self.debug_text.anchorX=0
     self.debug_text.x=self.yes_x + self.yes_width + 15
     self.debug_text:setFillColor(0,0,0)
-    self.debug_text.isVisible = false -- SET TO FALSE TO REMOVE RADIO DEBUG TEXT
+    self.debug_text.isVisible = show_debug_text
 
     if default_val == true then
         self.rad_false_off.isVisible = true
@@ -251,11 +255,11 @@ function Radio.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, 
 end
 
 SingleSelect = {}
-function SingleSelect.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, spac2, radio_size, options, opt_font_size, num_rows, colors, default_value)
+function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, radio_size, options, opt_font_size, num_rows, colors, default_value)
     local self = setmetatable({}, SingleSelect)
     self.id_need = calcIDNeed(table.getn(options))
     for i=0,self.id_need-1 do
-        add_id(id + i)
+        add_id_key(id + i,key)
     end
     --self.val = default_value
     for i,v in ipairs(options) do
@@ -353,9 +357,9 @@ function SingleSelect.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, 
 end
 
 TextInput = {}
-function TextInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
+function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
     local self =setmetatable({}, TextInput)
-    add_id(id)
+    add_id_key(id,key)
     Data.recorded_data[id] = ""
 
     self.intext_text = display.newText({parent=sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
@@ -376,28 +380,30 @@ function TextInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spa
     self.debug_text.anchorY=0
     self.debug_text.y = self.text_input.y + self.text_input.height + 15
     self.debug_text:setFillColor(0,0,0)
-    self.debug_text.isVisible = true -- SET TO FALSE TO REMOVE RADIO DEBUG TEXT
+    self.debug_text.isVisible = show_debug_text
 
     self.text_enter = function(event)
         --if event.phase == "ended" or event.phase == "submitted" then
         if event.phase == "editing" then
-            --self.curr_text = event.text
             local data = event.text
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(tostring(data))
+        elseif event.pahse == "ended" then
+            native.setKeyboardFocus(nil)
         end
     end
 
     self.text_input:addEventListener("userInput", self.text_enter)
+    return self
 end
 
 FreeNumInput = {}
-function FreeNumInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num)
+function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num)
     local self = setmetatable({}, FreeNumInput)
     self.id_need = calcIDNeed(max_num)
     print("Recval:"..tostring(self.id_need))
     for i=0,self.id_need-1 do
-        add_id(id + i)
+        add_id_key(id + i,key)
         Data.recorded_data[id+i] = 0
     end
     --self.input_val = ""
@@ -419,7 +425,7 @@ function FreeNumInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, 
     self.debug_text.anchorX = 0
     self.debug_text.x = self.line_input.x + self.line_input.width + spac1
     self.debug_text:setFillColor(0,0,0)
-    self.debug_text.isVisible = true -- SET TO FALSE TO REMOVE RADIO DEBUG TEXT
+    self.debug_text.isVisible = show_debug_text
 
     self.text_enter = function(event)
         local data = ""
@@ -431,7 +437,7 @@ function FreeNumInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, 
             end
             local id_idx = table.indexOf(Data.errors, id)
             if data_num < min_num or data_num > max_num then
-                if id_idx == Nil then
+                if id_idx == nil then
                     self.prompt_text:setFillColor(1,0,0)
                     table.insert(Data.errors, (id))
                     Data.error_circle = {self.prompt_text.x + (self.prompt_text.width / 2), y_val, self.prompt_text.width, self.prompt_text.height}
@@ -449,5 +455,38 @@ function FreeNumInput.init(sceneGroup, id, val_text, font_size, y_val, lft_mrg, 
     end
 
     self.line_input:addEventListener("userInput", self.text_enter)
+    return self
+end
+
+QRCode = {}
+function QRCode.init(sceneGroup, data, dim, x_val, y_val)
+    local self = setmetatable({}, QRCode)
+    local ok, tab_or_msg = QREncode.qrcode(data)
+    self.pixels = {}
+    if not ok then
+        self.err_txt = display.newText({parent=sceneGroup, text="QR Code Failed to Generate.", x=lft_mrg, y=y_val, font=native.systemFont, fontSize=40, align="center"})
+        print(tab_or_msg)
+    else
+        col = table.getn(tab_or_msg)
+        row = table.getn(tab_or_msg[1])
+        pw = math.floor(dim/col + 0.5)
+        ph = math.floor(dim/row + 0.5)
+        for i,r in ipairs(tab_or_msg) do
+            y = y_val + (ph*(i-1))
+            for j,p in ipairs(r) do
+                x = x_val + (pw*(j-1))
+                print("Printing pixel ("..tostring(i)..","..tostring(j)..") with color "..tostring(p).." at ("..tostring(x)..","..tostring(y)..")")
+                pixel = display.newRect(sceneGroup, x, y, pw, ph)
+                pixel.anchorX=0
+                pixel.anchorY=0
+                if p > 0 then
+                    pixel:setFillColor(0,0,0)
+                else
+                    pixel:setFillColor(1,1,1)
+                end
+                table.insert(self.pixels,pixel)
+            end
+        end
+    end
     return self
 end

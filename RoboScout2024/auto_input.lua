@@ -16,12 +16,16 @@ local scene = composer.newScene()
 -- Generic Event Functions
 -- -----------------------
 	local function go_back_screen()
-		local prev_scene = composer.getSceneName("previous")
-		composer.gotoScene(prev_scene)
+		composer.gotoScene("match_info")
 	end
 
-	local function submit_page ()
-		Data.print_recorded_data()
+	local function submit_page (sceneGroup)
+		if table.getn(Data.errors) > 0 then
+			print("Flashing error circle")
+			flash_error(Data.error_circle, 200, 10, sceneGroup)
+		else
+			composer.gotoScene("info_submit")
+		end
 	end
 -- ---------------------
 -- Scene Event Functions
@@ -45,7 +49,7 @@ function scene:create(event)
 	back_button.x=5
 	back_button.y=5
 
-	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
+	local submit_button = display.newImageRect(sceneGroup, asset_loc.."continue_button.png", 100, 50)
 	submit_button.anchorX=0.5
 	submit_button.anchorY=1
 	submit_button.x=display.contentCenterX
@@ -55,15 +59,12 @@ function scene:create(event)
 	debug_text:setFillColor(0,0,0)
 	debug_text.anchorY=1
 
-    local test_id_1 = Objects.Inc_Dec.init(sceneGroup, 2, "Notes Scored\nin Amp", 20, 70, 10, 20, 20, 30, 30, 30, 25, 0, 20)
-    local test_id_2 = Objects.Inc_Dec.init(sceneGroup,3,"Text 2", 20, 120, 15, 20, 20, 30, 35, 30, 25, 0, 7)
-    local test_radio_1 = Objects.Radio.init(sceneGroup,4,"Radio Test\nMultiLine", 20, 170, 15, 20, 20, 12, 6, 35, true, false)
-    local test_radio_2 = Objects.Radio.init(sceneGroup,5,"Radio Test\n#2", 20, 230, 15, 20, 20, 12, 6, 35, false, true)
-	local function submit_page_onscreen()
-		debug_text.text = Data.get_recorded_data()
-	end
+    local test_id_1 = Objects.Inc_Dec.init(sceneGroup, 3, "Notes in amp", "Notes Scored\nin Amp", 20, 70, 10, 20, 20, 30, 30, 30, 25, 0, 20)
+    local test_id_2 = Objects.Inc_Dec.init(sceneGroup,4,"Txt2","Text 2", 20, 120, 15, 20, 20, 30, 35, 30, 25, 0, 7)
+    local test_radio_1 = Objects.Radio.init(sceneGroup,5,"Radio color","Radio Test\nMultiLine", 20, 170, 15, 20, 20, 12, 6, 35, true, false)
+    local test_radio_2 = Objects.Radio.init(sceneGroup,6,"BW radio","Radio Test\n#2", 20, 230, 15, 20, 20, 12, 6, 35, false, true)
 	back_button:addEventListener("tap", go_back_screen)
-	submit_button:addEventListener("tap", submit_page_onscreen)
+	submit_button:addEventListener("tap", submit_page)
 end
 
 -- show()

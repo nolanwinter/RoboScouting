@@ -1,24 +1,137 @@
 module("Data", package.seeall)
 
 ids = {}
+for i=0, 99 do
+    ids[i] = false
+end
+keys = {}
+for i=0, 99 do
+    keys[i] = ""
+end
 
 recorded_data = {}
+data_history = {}
+for i=1,100 do
+    data_history[i] = ""
+end
 
 errors = {}
 error_circle = {0,0,0,0}
 
 function print_recorded_data()
     print("[")
-    for i=0,table.getn(Data.recorded_data) do
-        print(tostring(i)..":"..tostring(Data.recorded_data[i])..",")
+    for i=0,99 do
+        if ids[i] == true then
+            print("("..tostring(i)..")"..keys[i]..": "..tostring(Data.recorded_data[i])..",")
+        end
     end
     print("]")
 end
 
-function get_recorded_data()
+function get_readable_data_vert()
     local str = ""
-    for i=0,table.getn(Data.recorded_data) do
-        str = str..(tostring(i)..":"..tostring(Data.recorded_data[i]).."\n")
+    for i=0,99 do
+        if ids[i] == true then
+            data = Data.recorded_data[i]
+            str = str..(tostring(keys[i])..":"..tostring(data).."\n")
+        end
     end
     return str
+end
+
+function get_readable_data_peak_vert()
+    local str = ""
+    for i=0,2 do
+        if ids[i] == true then
+            data = Data.recorded_data[i]
+            str = str..(tostring(keys[i])..":"..tostring(data).."\n")
+        end
+    end
+    return str
+end
+
+function get_readable_data()
+    local str = ""
+    for i=0,99 do
+        if ids[i] == true then
+            data = Data.recorded_data[i]
+            str = str..(tostring(keys[i])..":"..tostring(data).." ")
+        end
+    end
+    return str
+end
+
+function get_data_short()
+    local str = ""
+    for i=0,99 do
+        if ids[i] == true then
+            data = Data.recorded_data[i]
+            if i < 10 then
+                str = str.."0"
+            end
+            str = str..tostring(i)
+            if (not (type(data) == "string")) and data < 10 then
+                str = str.."0"
+            end
+            str = str..tostring(data)
+        end
+    end
+    return str
+end
+
+function update_qr_history()
+	date_time = os.date("%m/%d/%y %H:%M:%S", os.time())
+	readable_match_data = get_readable_data()
+	short_match_data = get_data_short()
+	saved_str = date_time.."\n"..readable_match_data.."\n"..short_match_data.."\n\n"
+	table.insert(data_history, 1, saved_str)
+	table.remove(data_history)
+end
+
+function save_history()
+	local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
+	local file, errorStr = io.open(path, "w")
+	if not file then
+		error("Could not find qr_history.txt.", 1)
+	else
+		file_str = ""
+		for i,v in ipairs(data_history) do
+			if v ~= "" then
+				file_str = file_str..v
+			end
+		end
+		file:write(trim(file_str))
+		io.close(file)
+	end
+	file = nil
+    print(tostring(data_history[2]))
+end
+
+function read_history()
+    local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
+	local file, errorStr = io.open(path, "r")
+	if not file then
+		error("Could not find qr_history.txt.", 1)
+	else
+        line = ""
+        for i=1, table.getn(data_history) do
+            match_str = ""
+            if line == nil then
+                break
+            end
+            while true do
+                line = file:read("*l")
+                if line == nil or line == "" then
+                    break
+                else
+                    match_str = match_str..line.."\n"
+                end
+            end
+            data_history[i] = match_str.."\n"
+        end
+    end
+end
+            
+function trim(s)
+    return s:match'^%s*(.*%S)' or ''
 end

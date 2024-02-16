@@ -37,9 +37,10 @@ end
 local function submit_page (sceneGroup)
 	if table.getn(Data.errors) > 0 then
 		print("Flashing error circle")
+		system.vibrate("notification", "error")
 		flash_error(Data.error_circle, 200, 10, sceneGroup)
 	else
-		composer.gotoScene("auto_input")
+		composer.gotoScene("auto_input") 
 	end
 end
 
@@ -59,14 +60,15 @@ function scene:create(event)
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
     background.fill = bckgnd_grad
 
-	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
+	local submit_button = display.newImageRect(sceneGroup, asset_loc.."continue_button.png", 100, 50)
 	submit_button.anchorX=0.5
 	submit_button.anchorY=1
 	submit_button.x=display.contentCenterX
 	submit_button.y=display.contentHeight - 10
 	submit_button:addEventListener("tap", function() submit_page(sceneGroup) end)
-	match_num = Objects.FreeNumInput.init(sceneGroup, 0, "Match Number", 25, 70, 10, 15, 70, "0", 15, 0, 99)
-	local team_select = Objects.SingleSelect.init(sceneGroup, 1, "Team Select", 25, 120, 10, 15, 16, 30, {"Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"}, 10, 2, {"red", "red", "red", "blue", "blue", "blue"}, "Red 1")
+	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,10,0,10,10,30,{"Qual","Elim","Test"},15,1,{"black","black","red"},"Qual")
+	match_num = Objects.FreeNumInput.init(sceneGroup, 1, "Match #","Match Number", 25, 120, 10, 15, 70, "0", 15, 0, 99)
+	local team_select = Objects.SingleSelect.init(sceneGroup, 2, "Team","Team Select", 25, 180, 0, 10, 10, 30, {"Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"}, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, "Red 1")
 end
 
 -- show()

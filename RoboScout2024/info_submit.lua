@@ -11,9 +11,24 @@ local notes_in_amp = 0
 local composer = require("composer")
 local scene = composer.newScene()
 
+local text_input = 0
+
 -- -----------------------
 -- Generic Event Functions
 -- -----------------------
+
+local function go_back_screen()
+		composer.gotoScene("auto_input")
+	end
+
+	local function submit_page (sceneGroup)
+		if table.getn(Data.errors) > 0 then
+			print("Flashing error circle")
+			flash_error(Data.error_circle, 200, 10, sceneGroup)
+		else
+			composer.gotoScene("qr_upload")
+		end
+	end
 
 -- ---------------------
 -- Scene Event Functions
@@ -31,11 +46,21 @@ function scene:create(event)
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
     background.fill = bckgnd_grad
 
-    local test_id_1 = Objects.Inc_Dec.init(sceneGroup,"Notes Scored\nin Amp", 20, 10, 10, 20, 20, 30, 30, 30, 25, 0, 20)
-    local test_id_2 = Objects.Inc_Dec.init(sceneGroup,"Text 2", 20, 60, 15, 20, 20, 30, 35, 30, 25, 0, 7)
-    local test_radio_1 = Objects.Radio.init(sceneGroup,"Radio Test\nMultiLine", 20, 110, 15, 20, 20, 35, true, false)
-    local test_radio_2 = Objects.Radio.init(sceneGroup,"Radio Test\n#2", 20, 160, 15, 20, 20, 35, false, true)
-    local text_input = Objects.TextInput.init(sceneGroup, "Anything special about the team\nto mention?", 20, 210, 10, 20, 200, "Test hint.", 18)
+	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
+	back_button.anchorX=0
+	back_button.anchorY=0
+	back_button.x=5
+	back_button.y=5
+
+	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
+	submit_button.anchorX=0.5
+	submit_button.anchorY=1
+	submit_button.x=display.contentCenterX
+	submit_button.y=display.contentHeight - 10
+
+    text_input = Objects.TextInput.init(sceneGroup,99,"Team notes","Anything special about the team\nto mention?", 20, 60, 10, 20, 200, "Test hint.", 18)
+	back_button:addEventListener("tap", go_back_screen)
+	submit_button:addEventListener("tap", submit_page)
 end
 
 -- show()
@@ -46,7 +71,7 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-
+		text_input.text_input.isVisible=true
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 
@@ -65,7 +90,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+		text_input.text_input.isVisible=false
 	end
 end
 

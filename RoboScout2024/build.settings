@@ -21,6 +21,7 @@ settings =
 		usesPermissions =
 		{
 			"android.permission.INTERNET",
+			"android.permission.VIBRATE",
 		},
 	},
 
@@ -53,5 +54,11 @@ settings =
 		-- Exclude unnecessary files for each platform
 		all = { "Icon.png", "Icon-*dpi.png", "Images.xcassets", },
 		android = { "LaunchScreen.storyboardc", },
+	},
+
+	splashScreen =
+	{
+		enable = true,
+		image = "Assets/app_splash.png"
 	},
 }

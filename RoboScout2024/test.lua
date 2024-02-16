@@ -30,24 +30,9 @@ function scene:create(event)
     }
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
     background.fill = bckgnd_grad
-	background.alpha=0.3
+	--background.alpha=0.3
 
-
-	local cont = display.newContainer(sceneGroup, display.contentWidth, display.contentHeight)
-	cont.x = background.x
-    cont.y = 100--background.y
-    cont.anchorX=0.5
-    cont.anchorY=0
-    cont.anchorChildren=true
-
-	local background2 = display.newRect(cont,0,0,display.contentWidth,1.5*display.contentHeight)
-    background2.fill = bckgnd_grad
-	local cont_origin =display.newCircle( cont, 0, 0, 10 )
-
-	local origin =display.newCircle( sceneGroup, 0, 0, 10 )
-	origin:setFillColor(0,0,1)
-	local bound =display.newCircle( sceneGroup, display.contentWidth, display.contentHeight, 10 )
-	bound:setFillColor(0,1,0)
+	test_qr = Objects.QRCode.init(sceneGroup, "Hello World! This is Nolan successfully talking to my phone!", 250, 20, 60)
     
 end
 

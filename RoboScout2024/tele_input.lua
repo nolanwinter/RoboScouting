@@ -31,11 +31,24 @@ function scene:create(event)
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
     background.fill = bckgnd_grad
 
-    local test_id_1 = Objects.Inc_Dec.init(sceneGroup,"Notes Scored\nin Amp", 20, 10, 10, 20, 20, 30, 30, 30, 25, 0, 20)
-    local test_id_2 = Objects.Inc_Dec.init(sceneGroup,"Text 2", 20, 60, 15, 20, 20, 30, 35, 30, 25, 0, 7)
-    local test_radio_1 = Objects.Radio.init(sceneGroup,"Radio Test\nMultiLine", 20, 110, 15, 20, 20, 35, true, false)
-    local test_radio_2 = Objects.Radio.init(sceneGroup,"Radio Test\n#2", 20, 160, 15, 20, 20, 35, false, true)
-    local text_input = Objects.TextInput.init(sceneGroup, "Anything special about the team\nto mention?", 20, 210, 10, 20, 200, "Test hint.", 18)
+    local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=10, font=native.systemFont, fontSize=20, align="center"})
+	speaker_heading.anchorY=0
+	speaker_heading:setFillColor(0,0,0)
+	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 50, "Speaker Shots Made","Made",15,50,10,5,5,5,30,20,20,0,10)
+	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 51, "Speaker Shots Miss","Missed",15,50,display.contentCenterX,5,5,5,30,20,20,0,10)
+
+	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=70, font=native.systemFont, fontSize=20, align="center"})
+	amp_heading.anchorY=0
+	amp_heading:setFillColor(0,0,0)
+	local amp_made = Objects.Inc_Dec.init(sceneGroup, 52, "Amp Shots Made","Made",15,110,10,5,5,5,30,20,20,0,10)
+	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 53, "Amp Shots Miss","Missed",15,110,display.contentCenterX,5,5,5,30,20,20,0,10)
+
+	local trap_heading = display.newText({parent=sceneGroup, text="Trap Shots", x=display.contentCenterX,y=130, font=native.systemFont, fontSize=20, align="center"})
+	trap_heading.anchorY=0
+	trap_heading:setFillColor(0,0,0)
+	local trap_made = Objects.Inc_Dec.init(sceneGroup, 54, "Trap Shots Made","Made",15,170,10,5,5,5,30,20,20,0,10)
+	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 55, "Trap Shots Miss","Missed",15,170,display.contentCenterX,5,5,5,30,20,20,0,10)
+
 end
 
 -- show()
