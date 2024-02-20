@@ -18,7 +18,7 @@ local text_input = 0
 -- -----------------------
 
 local function go_back_screen()
-		composer.gotoScene("auto_input")
+		composer.gotoScene("tele_input")
 	end
 
 	local function submit_page (sceneGroup)
@@ -43,22 +43,22 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 
 	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
 	back_button.anchorX=0
 	back_button.anchorY=0
-	back_button.x=5
-	back_button.y=5
+	back_button.x=5 + Data.sx
+	back_button.y=5 + Data.sy
 
 	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
 	submit_button.anchorX=0.5
 	submit_button.anchorY=1
 	submit_button.x=display.contentCenterX
-	submit_button.y=display.contentHeight - 10
+	submit_button.y=Data.sh - 5 + Data.sy
 
-    text_input = Objects.TextInput.init(sceneGroup,99,"Team notes","Anything special about the team\nto mention?", 20, 60, 10, 20, 200, "Test hint.", 18)
+    text_input = Objects.TextInput.init(sceneGroup,99,"Team notes","Any additional notes?\n(e.g. robot was disabled)\nLeave empty if there's\nnothing to add.", 20, 110, 10, 20, 250, "Test hint.", 18)
 	back_button:addEventListener("tap", go_back_screen)
 	submit_button:addEventListener("tap", submit_page)
 end

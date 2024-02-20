@@ -24,7 +24,7 @@ local scene = composer.newScene()
 			print("Flashing error circle")
 			flash_error(Data.error_circle, 200, 10, sceneGroup)
 		else
-			composer.gotoScene("info_submit")
+			composer.gotoScene("tele_input")
 		end
 	end
 -- ---------------------
@@ -40,31 +40,41 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 
 	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
 	back_button.anchorX=0
 	back_button.anchorY=0
-	back_button.x=5
-	back_button.y=5
+	back_button.x=5 + Data.sx
+	back_button.y=5 + Data.sy
 
 	local submit_button = display.newImageRect(sceneGroup, asset_loc.."continue_button.png", 100, 50)
 	submit_button.anchorX=0.5
 	submit_button.anchorY=1
 	submit_button.x=display.contentCenterX
-	submit_button.y=display.contentHeight - 10
+	submit_button.y=Data.sh - 5 + Data.sy
 
-	local debug_text = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=display.contentHeight - 100, font=native.systemFont, font_szie=15, align="center"})
-	debug_text:setFillColor(0,0,0)
-	debug_text.anchorY=1
-
-    local test_id_1 = Objects.Inc_Dec.init(sceneGroup, 3, "Notes in amp", "Notes Scored\nin Amp", 20, 70, 10, 20, 20, 30, 30, 30, 25, 0, 20)
-    local test_id_2 = Objects.Inc_Dec.init(sceneGroup,4,"Txt2","Text 2", 20, 120, 15, 20, 20, 30, 35, 30, 25, 0, 7)
-    local test_radio_1 = Objects.Radio.init(sceneGroup,5,"Radio color","Radio Test\nMultiLine", 20, 170, 15, 20, 20, 12, 6, 35, true, false)
-    local test_radio_2 = Objects.Radio.init(sceneGroup,6,"BW radio","Radio Test\n#2", 20, 230, 15, 20, 20, 12, 6, 35, false, true)
 	back_button:addEventListener("tap", go_back_screen)
 	submit_button:addEventListener("tap", submit_page)
+    
+    local auto_heading = display.newText({parent=sceneGroup, text="Autonomous\nPeriod", x=display.contentCenterX,y=60 + Data.sy, font=native.systemFont, fontSize=32, align="center"})
+	auto_heading.anchorY=0
+	auto_heading:setFillColor(0,0,0)
+	
+	local test_radio_1 = Objects.Radio.init(sceneGroup,20,"Cross Line","Crossed\nStart Line?", 25, 170, 10, 20, 20, 13, 3, 40, true, false)
+    
+	local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=230 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
+	speaker_heading.anchorY=0
+	speaker_heading:setFillColor(0,0,0)
+	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 21, "Auto Speaker Made","Made",15,290,10,5,5,5,35,23,20,0,99)
+	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 22, "Atuo Speaker Miss","Missed",15,290,display.contentCenterX,5,5,5,35,23,20,0,99)
+
+	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=320 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
+	amp_heading.anchorY=0
+	amp_heading:setFillColor(0,0,0)
+	local amp_made = Objects.Inc_Dec.init(sceneGroup, 23, "Auto Amp Made","Made",15,380,10,5,5,5,35,23,20,0,99)
+	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 24, "Auto Amp Miss","Missed",15,380,display.contentCenterX,5,5,5,35,23,20,0,99)
 end
 
 -- show()

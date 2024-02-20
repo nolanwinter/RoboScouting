@@ -1,5 +1,11 @@
 module("Data", package.seeall)
 
+local topInset, leftInset, bottomInset, rightInset = display.getSafeAreaInsets()
+sx = display.screenOriginX + leftInset
+sy = display.screenOriginY + topInset
+sw = display.actualContentWidth - ( leftInset + rightInset )
+sh = display.actualContentHeight - ( topInset + bottomInset )
+
 ids = {}
 for i=0, 99 do
     ids[i] = false
@@ -70,7 +76,7 @@ function get_data_short()
                 str = str.."0"
             end
             str = str..tostring(i)
-            if (not (type(data) == "string")) and data < 10 then
+            if (type(data) == "number") and data < 10 then
                 str = str.."0"
             end
             str = str..tostring(data)
@@ -109,7 +115,12 @@ end
 
 function read_history()
     local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
-	local file, errorStr = io.open(path, "r")
+    local file, errorStr = io.open(path, "w")
+    if not file then
+        error("Could not find qr_history.txt.", 1)
+    end
+    io.close(file)
+    local file, errorStr = io.open(path, "r")
 	if not file then
 		error("Could not find qr_history.txt.", 1)
 	else
@@ -129,6 +140,7 @@ function read_history()
             end
             data_history[i] = match_str.."\n"
         end
+        io.close(file)
     end
 end
             

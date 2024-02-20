@@ -27,6 +27,7 @@ end
 local function start_next_match()
 	composer.removeScene("match_info", true)
 	composer.removeScene("auto_input", true)
+	composer.removeScene("tele_input", true)
 	composer.removeScene("info_submit", true)
 	Data.update_qr_history()
 	Data.save_history()
@@ -49,22 +50,22 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 
 	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
 	back_button.anchorX=0
 	back_button.anchorY=0
-	back_button.x=5
-	back_button.y=5
+	back_button.x=5 + Data.sx
+	back_button.y=5 + Data.sy
 
 	local next_match_button = display.newImageRect(sceneGroup, asset_loc.."next_match_button.png", 100, 50)
 	next_match_button.anchorX=0.5
 	next_match_button.anchorY=1
 	next_match_button.x=display.contentCenterX
-	next_match_button.y=display.contentHeight - 10
+	next_match_button.y=Data.sh - 5 + Data.sy
 
-    captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=300, font=native.systemFont, font_size=60, align="center"})
+    captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=70 + Data.sy, font=native.systemFont, font_size=100, align="center"})
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
@@ -81,7 +82,8 @@ function scene:show( event )
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		captured_info.text=Data.get_readable_data_peak_vert()
-		data_qr = Objects.QRCode.init(sceneGroup, Data.get_data_short(), 250, (display.contentCenterX -(250/2)), (30))
+		captured_info.size=35
+		data_qr = Objects.QRCode.init(sceneGroup, Data.get_data_short(), 250, (display.contentCenterX -(250/2)), 220)
 		Data.print_recorded_data()
 		
 	elseif ( phase == "did" ) then

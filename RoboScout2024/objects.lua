@@ -5,7 +5,7 @@ require "qrencode"
 --qrencode = QREncode
 --local qrencode = dofile("qrencode.lua")
 
-local show_debug_text = true
+local show_debug_text = false
 
 local asset_loc = "Assets/"
 
@@ -61,6 +61,8 @@ end
 
 Inc_Dec = {}
 function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, spac3, button_size, val_size, val_font_size, min_val, max_val)
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, Inc_Dec)
     self.id_need = calcIDNeed(max_val)
     self.def_val = min_val
@@ -74,16 +76,16 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
     self.id_text.anchorX=0
     self.id_text:setFillColor(0,0,0)
     
-    self.id_plus = display.newImageRect(sceneGroup, asset_loc.."green_plus.png", button_size, button_size)
-    self.id_plus.anchorX=0
-    self.id_plus.x=self.id_text.x + self.id_text.width + spac1
-    self.id_plus.y=y_val
+    self.id_minus = display.newImageRect(sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
+    self.id_minus.anchorX=0
+    self.id_minus.x=self.id_text.x + self.id_text.width + spac1
+    self.id_minus.y=y_val
 
     local bkgd_height = math.max(self.id_text.height, button_size)
     self.id_val_bkgd = display.newRoundedRect(sceneGroup, 0, 0, val_size, 0, 12)
     self.id_val_bkgd.height=bkgd_height
     self.id_val_bkgd.anchorX=0
-    self.id_val_bkgd.x=self.id_plus.x + self.id_plus.width + spac3
+    self.id_val_bkgd.x=self.id_minus.x + self.id_minus.width + spac3
     self.id_val_bkgd.y=y_val
 
     self.id_val_text = display.newText({parent=sceneGroup,text=tostring(self.id_val),x=0,y=0,font=native.systemFont,fontSize=val_font_size})
@@ -92,10 +94,10 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
     self.id_val_text.x = self.id_val_bkgd.x + (self.id_val_bkgd.width/2)
     self.id_val_text.y = self.id_val_bkgd.y
 
-    self.id_minus = display.newImageRect(sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
-    self.id_minus.anchorX=0
-    self.id_minus.x=self.id_val_bkgd.x + self.id_val_bkgd.width + spac2
-    self.id_minus.y=y_val
+    self.id_plus = display.newImageRect(sceneGroup, asset_loc.."green_plus.png", button_size, button_size)
+    self.id_plus.anchorX=0
+    self.id_plus.x=self.id_val_bkgd.x + self.id_val_bkgd.width + spac2
+    self.id_plus.y=y_val
 
     self.tap_id_plus = function ()
         self.id_val = math.min(self.id_val + 1,max_val)
@@ -122,6 +124,8 @@ end
 
 Radio = {}
 function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, label_size, spac_lbl, radio_size, colored, default_val)
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, Radio)
     add_id_key(id,key)
     Data.recorded_data[id] = (default_val and 1 or 0)
@@ -256,21 +260,31 @@ end
 
 SingleSelect = {}
 function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, radio_size, options, opt_font_size, num_rows, colors, default_value)
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, SingleSelect)
     self.id_need = calcIDNeed(table.getn(options))
     for i=0,self.id_need-1 do
         add_id_key(id + i,key)
     end
     --self.val = default_value
+    self.def_found = false
     for i,v in ipairs(options) do
         if v == default_value then
             split = splitVals(i, self.id_need)
             setData(split, id, self.id_need)
+            self.def_found = true
+            break
         end
+    end
+    if not def_found then
+        split = splitVals(0, self.id_need)
+        setData(split, id, self.id_need)
     end
 
     self.select_text = display.newText({parent=sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.select_text.anchorX=0.5
+    self.select_text.anchorY=0
     self.select_text:setFillColor(0,0,0)
 
     self.num_opt = table.getn(options)
@@ -280,7 +294,7 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     print("Total #: "..tostring(self.num_opt).." Rows: "..tostring(num_rows).." Opt per row: "..tostring(self.opt_per_row).." Color #: "..tostring(self.num_color))
     self.button_group = display.newGroup()
     self.button_group.x = self.select_text.x
-    self.button_group.y = self.select_text.y + (self.select_text.height/2) + spac2
+    self.button_group.y = self.select_text.y + self.select_text.height + spac2
     self.button_group.anchorX=0.5
     self.button_group.anchorY=0
     self.button_group.anchorChildren=true
@@ -308,7 +322,7 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
             elseif color == "red" then
                 rad_on_asset = asset_loc.."radio_red.png"
             end
-            local temp_rad_lbl = display.newText({parent=self.button_group, text=tostring(name), x=lft_gap, y=y_val, font=native.systemFont, fontSize=opt_font_size, align="left"})
+            local temp_rad_lbl = display.newText({parent=self.button_group, text=tostring(name), x=lft_gap, y=y_val, font=native.systemFont, fontSize=opt_font_size, align="center"})
             temp_rad_lbl.anchorX=0
             temp_rad_lbl:setFillColor(0,0,0)
             local temp_rad_off = display.newImageRect(self.button_group, rad_off_asset, radio_size, radio_size)
@@ -332,6 +346,7 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
                 y_val = y_val + temp_rad_lbl.height + temp_rad_on.height + (2*spac2)
             end
         end
+        self.bottom_y = self.button_group.y + self.button_group.height - Data.sy
     end
 
     self.select = function(idx)
@@ -354,10 +369,13 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
         v[2]:addEventListener("tap", function() self.select(i) end)
         v[3]:addEventListener("tap", function() self.select(i) end)
     end
+    return self
 end
 
 TextInput = {}
 function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
     local self =setmetatable({}, TextInput)
     add_id_key(id,key)
     Data.recorded_data[id] = ""
@@ -399,6 +417,8 @@ end
 
 FreeNumInput = {}
 function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num)
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, FreeNumInput)
     self.id_need = calcIDNeed(max_num)
     print("Recval:"..tostring(self.id_need))
@@ -412,12 +432,13 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     self.prompt_text.anchorX=0
     self.prompt_text:setFillColor(0,0,0)
 
-    self.line_input = native.newTextField(0, y_val, input_width, 1 )
+    self.line_input = native.newTextField(0, y_val, input_width, 1)
     self.line_input.anchorX=0
     self.line_input.x = self.prompt_text.x + self.prompt_text.width + spac1
     self.line_input.height = self.prompt_text.height
     self.line_input.size = input_size
     self.line_input.placeholder=text_hint
+    self.line_input.input_type = "number"
 
     sceneGroup:insert(self.line_input)
 
@@ -460,6 +481,8 @@ end
 
 QRCode = {}
 function QRCode.init(sceneGroup, data, dim, x_val, y_val)
+    y_val = y_val + Data.sy
+    x_val = x_val + Data.sx
     local self = setmetatable({}, QRCode)
     local ok, tab_or_msg = QREncode.qrcode(data)
     self.pixels = {}

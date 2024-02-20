@@ -28,11 +28,29 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 	--background.alpha=0.3
 
-	test_qr = Objects.QRCode.init(sceneGroup, "Hello World! This is Nolan successfully talking to my phone!", 250, 20, 60)
+	-- Gather insets (function returns these in the order of top, left, bottom, right)
+	local topInset, leftInset, bottomInset, rightInset = display.getSafeAreaInsets()
+	
+	-- Create a vector rectangle sized exactly to the "safe area"
+	local safeArea = display.newRect(
+		display.screenOriginX + leftInset, 
+		display.screenOriginY + topInset, 
+		display.actualContentWidth - ( leftInset + rightInset ), 
+		display.actualContentHeight - ( topInset + bottomInset )
+	)
+	--safeArea:translate( safeArea.width*0.5, safeArea.height*0.5 )
+	safeArea.anchorX=0
+	safeArea.anchorY=0
+	safeArea.x = 0
+	--safeArea.y = 0
+	safeArea:setFillColor(0,0,1)
+	safeArea.alpha = 0.3
+
+	--test_qr = Objects.QRCode.init(sceneGroup, "Hello World! This is Nolan successfully talking to my phone!", 250, 20, 60)
     
 end
 

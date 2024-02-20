@@ -15,6 +15,19 @@ local scene = composer.newScene()
 -- Generic Event Functions
 -- -----------------------
 
+local function go_back_screen()
+	composer.gotoScene("auto_input")
+end
+
+local function submit_page (sceneGroup)
+	if table.getn(Data.errors) > 0 then
+		print("Flashing error circle")
+		flash_error(Data.error_circle, 200, 10, sceneGroup)
+	else
+		composer.gotoScene("info_submit")
+	end
+end
+
 -- ---------------------
 -- Scene Event Functions
 -- ---------------------
@@ -28,26 +41,45 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.contentWidth,1.5*display.contentHeight)
+    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 
-    local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=10, font=native.systemFont, fontSize=20, align="center"})
+	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
+	back_button.anchorX=0
+	back_button.anchorY=0
+	back_button.x=5 + Data.sx
+	back_button.y=5 + Data.sy
+
+	local submit_button = display.newImageRect(sceneGroup, asset_loc.."continue_button.png", 100, 50)
+	submit_button.anchorX=0.5
+	submit_button.anchorY=1
+	submit_button.x=display.contentCenterX
+	submit_button.y=Data.sh - 5 + Data.sy
+
+	back_button:addEventListener("tap", go_back_screen)
+	submit_button:addEventListener("tap", submit_page)
+
+    local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=30 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	speaker_heading.anchorY=0
 	speaker_heading:setFillColor(0,0,0)
-	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 50, "Speaker Shots Made","Made",15,50,10,5,5,5,30,20,20,0,10)
-	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 51, "Speaker Shots Miss","Missed",15,50,display.contentCenterX,5,5,5,30,20,20,0,10)
+	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 40, "Speaker Shots Made","Made",15,80,10,5,5,5,30,23,20,0,10)
+	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 41, "Speaker Shots Miss","Missed",15,80,display.contentCenterX,5,5,5,30,23,20,0,10)
 
-	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=70, font=native.systemFont, fontSize=20, align="center"})
+	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	amp_heading.anchorY=0
 	amp_heading:setFillColor(0,0,0)
-	local amp_made = Objects.Inc_Dec.init(sceneGroup, 52, "Amp Shots Made","Made",15,110,10,5,5,5,30,20,20,0,10)
-	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 53, "Amp Shots Miss","Missed",15,110,display.contentCenterX,5,5,5,30,20,20,0,10)
+	local amp_made = Objects.Inc_Dec.init(sceneGroup, 42, "Amp Shots Made","Made",15,150,10,5,5,5,30,23,20,0,10)
+	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 43, "Amp Shots Miss","Missed",15,150,display.contentCenterX,5,5,5,30,23,20,0,10)
 
-	local trap_heading = display.newText({parent=sceneGroup, text="Trap Shots", x=display.contentCenterX,y=130, font=native.systemFont, fontSize=20, align="center"})
+	local trap_heading = display.newText({parent=sceneGroup, text="Trap Shots", x=display.contentCenterX,y=170 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	trap_heading.anchorY=0
 	trap_heading:setFillColor(0,0,0)
-	local trap_made = Objects.Inc_Dec.init(sceneGroup, 54, "Trap Shots Made","Made",15,170,10,5,5,5,30,20,20,0,10)
-	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 55, "Trap Shots Miss","Missed",15,170,display.contentCenterX,5,5,5,30,20,20,0,10)
+	local trap_made = Objects.Inc_Dec.init(sceneGroup, 44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
+	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
+
+	local defense_report = Objects.SingleSelect.init(sceneGroup, 46, "Defense", "Defensive Rating", 20, 255, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "Somewhat\nEffective", "\nDominant"}, 15, 1, {"black", "red", "blue", "green"}, "Did Not\nAttempt")
+	print("Bottom Y = : "..tostring(defense_report.bottom_y))
+	local endgame_report = Objects.SingleSelect.init(sceneGroup, 47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 10, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
 
 end
 
