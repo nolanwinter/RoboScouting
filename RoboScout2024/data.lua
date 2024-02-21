@@ -22,7 +22,12 @@ for i=1,100 do
 end
 
 errors = {}
-error_circle = {0,0,0,0}
+error_circle = {}
+
+scout_name = ""
+match_num = ""
+teams_to_scout = {"Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"}
+team_to_scout = "Red 1"
 
 function print_recorded_data()
     print("[")
@@ -50,9 +55,20 @@ function get_readable_data_peak_vert()
     for i=0,2 do
         if ids[i] == true then
             data = Data.recorded_data[i]
-            str = str..(tostring(keys[i])..":"..tostring(data).."\n")
+            if i == 2 then
+                print("Printing team relating to id "..tostring(Data.recorded_data[i]))
+                data = Data.teams_to_scout[Data.recorded_data[i]]
+            elseif i == 0 then
+                if Data.recorded_data[i] == 1 then
+                    data = "Qual"
+                else
+                    data = "Test"
+                end
+            end
+            str = str..(tostring(keys[i])..": "..tostring(data).."\n")
         end
     end
+    str = str..tostring(keys[3])..": "..tostring(Data.recorded_data[4]*100 + Data.recorded_data[3])
     return str
 end
 
@@ -109,20 +125,14 @@ function save_history()
 		file:write(trim(file_str))
 		io.close(file)
 	end
-	file = nil
-    print(tostring(data_history[2]))
+	file = nil    
 end
 
 function read_history()
     local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
-    local file, errorStr = io.open(path, "w")
-    if not file then
-        error("Could not find qr_history.txt.", 1)
-    end
-    io.close(file)
     local file, errorStr = io.open(path, "r")
 	if not file then
-		error("Could not find qr_history.txt.", 1)
+		--error("Could not find qr_history.txt.", 1)
 	else
         line = ""
         for i=1, table.getn(data_history) do

@@ -30,28 +30,25 @@ function scene:create(event)
     }
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
-	--background.alpha=0.3
 
-	-- Gather insets (function returns these in the order of top, left, bottom, right)
-	local topInset, leftInset, bottomInset, rightInset = display.getSafeAreaInsets()
-	
-	-- Create a vector rectangle sized exactly to the "safe area"
-	local safeArea = display.newRect(
-		display.screenOriginX + leftInset, 
-		display.screenOriginY + topInset, 
-		display.actualContentWidth - ( leftInset + rightInset ), 
-		display.actualContentHeight - ( topInset + bottomInset )
-	)
-	--safeArea:translate( safeArea.width*0.5, safeArea.height*0.5 )
-	safeArea.anchorX=0
-	safeArea.anchorY=0
-	safeArea.x = 0
-	--safeArea.y = 0
-	safeArea:setFillColor(0,0,1)
-	safeArea.alpha = 0.3
+	local button_back = display.newRect(sceneGroup,display.contentCenterX,40,50,20)    
+	button_back:setFillColor(0,0,0)
+	button_back:addEventListener("tap", function () print("Back button pressed") end)
 
-	--test_qr = Objects.QRCode.init(sceneGroup, "Hello World! This is Nolan successfully talking to my phone!", 250, 20, 60)
-    
+	local hidden_rect = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+	hidden_rect:setFillColor(1,1,1,0)
+	hidden_rect.isHitTestable = true
+	hidden_rect:addEventListener("tap", function() print("Hidden rect pressed") end)
+
+	local text = native.newTextField(display.contentCenterX, 100, 100, 200)
+	text.anchorY = 0
+	text.isEditable = true
+	text:addEventListener("tap", function() print("Text field pressed") end)
+	sceneGroup:insert(text)
+
+	local button_front = display.newRect(sceneGroup,display.contentCenterX,350,50,20)
+	button_front:setFillColor(1,0,0)
+	button_front:addEventListener("tap", function() print("Front Button pressed") end)
 end
 
 -- show()

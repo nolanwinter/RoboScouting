@@ -12,7 +12,8 @@ local notes_in_amp = 0
 local composer = require("composer")
 local scene = composer.newScene()
 
-local match_num = 0
+local match_num = nil
+local scout_name = nil
 
 -- -----------------------
 -- Generic Event Functions
@@ -36,9 +37,10 @@ end
 
 local function submit_page (sceneGroup)
 	if table.getn(Data.errors) > 0 then
-		print("Flashing error circle")
 		system.vibrate("notification", "error")
-		flash_error(Data.error_circle, 200, 10, sceneGroup)
+		for i,v in ipairs(Data.errors) do
+			flash_error(Data.error_circle[i], 200, 10, sceneGroup)
+		end
 	else
 		composer.gotoScene("auto_input") 
 	end
@@ -66,9 +68,12 @@ function scene:create(event)
 	submit_button.x=display.contentCenterX
 	submit_button.y=Data.sh - 5 + Data.sy
 	submit_button:addEventListener("tap", function() submit_page(sceneGroup) end)
-	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,60,0,10,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")
-	match_num = Objects.FreeNumInput.init(sceneGroup, 1, "Match #","Match Number", 25, 170, 30, 15, 70, "0", 15, 0, 99)
-	local team_select = Objects.SingleSelect.init(sceneGroup, 2, "Team","Team Select", 25, 200, 0, 10, 10, 30, {"Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"}, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, "Red 1")
+
+	scout_name = Objects.SingleLineInput.init(sceneGroup, 98, "Scout Name", "Scout's name", 25, 60, 30, 10, 100, "Dr. Jerry", 15, tostring(Data.scout_name))
+	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,90,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")
+	match_num = Objects.FreeNumInput.init(sceneGroup, 1, "Match #","Match Number", 25, 200, 30, 15, 70, "0", 15, 0, 99,tonumber(Data.match_num))
+	local team_select = Objects.SingleSelect.init(sceneGroup, 2, "Team","Team Select", 25, 230, 0, 10, 10, 30, Data.teams_to_scout, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, Data.team_to_scout)
+	team_num = Objects.FreeNumInput.init(sceneGroup, 3, "Team #","Team Number", 25, team_select.bottom_y + 40, 30, 10, 100, "254", 15, 0, 9789,"")
 end
 
 -- show()
@@ -80,7 +85,8 @@ function scene:show( event )
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		match_num.line_input.isVisible=true
-
+		scout_name.line_input.isVisible=true
+		team_num.line_input.isVisible=true
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 
@@ -99,9 +105,9 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-		print(match_num)
-		--match_num.line_input:removeSelf()
 		match_num.line_input.isVisible=false
+		scout_name.line_input.isVisible=false
+		team_num.line_input.isVisible=false
 	end
 end
 

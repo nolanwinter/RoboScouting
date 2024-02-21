@@ -21,7 +21,6 @@ local scene = composer.newScene()
 
 	local function submit_page (sceneGroup)
 		if table.getn(Data.errors) > 0 then
-			print("Flashing error circle")
 			flash_error(Data.error_circle, 200, 10, sceneGroup)
 		else
 			composer.gotoScene("tele_input")

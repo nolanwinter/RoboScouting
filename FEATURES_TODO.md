@@ -10,8 +10,13 @@ Currently Implemented Features:
 - Start New Match / Save data button
 - Save match data on phone in text file
 - Display match data in the form of a QR code
+- Match number automatically increments each match
+- Scout name and team selector remain between matches
+- Use number-only keyboard for match and team number inputs
+- Keyboards are hidden when clicking away or pressing enter
 
 TODO:
-- Handle negative numbers
-- Download match history file (make copy to downloads folder)
-- Scout name input (autofill between matches)
+- Create popup to confirm starting a new match
+- Add QR history view
+- Include proper attribution for qr code generator
+- Handle negative numbers (currently not planned/needed)

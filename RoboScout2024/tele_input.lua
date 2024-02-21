@@ -21,7 +21,6 @@ end
 
 local function submit_page (sceneGroup)
 	if table.getn(Data.errors) > 0 then
-		print("Flashing error circle")
 		flash_error(Data.error_circle, 200, 10, sceneGroup)
 	else
 		composer.gotoScene("info_submit")
@@ -78,8 +77,11 @@ function scene:create(event)
 	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
 
 	local defense_report = Objects.SingleSelect.init(sceneGroup, 46, "Defense", "Defensive Rating", 20, 255, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "Somewhat\nEffective", "\nDominant"}, 15, 1, {"black", "red", "blue", "green"}, "Did Not\nAttempt")
-	print("Bottom Y = : "..tostring(defense_report.bottom_y))
 	local endgame_report = Objects.SingleSelect.init(sceneGroup, 47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 10, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
+	harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
+	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 10, font=native.systemFont, fontSize=13, align="center"})
+	harmony_note.anchorY=0
+	harmony_note:setFillColor(0.5,0.5,0.5)
 
 end
 

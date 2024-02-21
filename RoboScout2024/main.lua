@@ -6,6 +6,8 @@
 
 require "data"
 
+system.activate("multitouch")
+
 local composer = require("composer")
 composer.isDebug = True
 display.setStatusBar(display.HiddenStatusBar)

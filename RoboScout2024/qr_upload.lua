@@ -29,6 +29,10 @@ local function start_next_match()
 	composer.removeScene("auto_input", true)
 	composer.removeScene("tele_input", true)
 	composer.removeScene("info_submit", true)
+	Data.match_num = Data.recorded_data[1] + 1
+	print("Next match num "..Data.match_num)
+	Data.scout_name = Data.recorded_data[98]
+	Data.team_to_scout = Data.teams_to_scout[Data.recorded_data[2]]
 	Data.update_qr_history()
 	Data.save_history()
 	Data.recorded_data = {}
@@ -65,7 +69,7 @@ function scene:create(event)
 	next_match_button.x=display.contentCenterX
 	next_match_button.y=Data.sh - 5 + Data.sy
 
-    captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=70 + Data.sy, font=native.systemFont, font_size=100, align="center"})
+    captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=50 + Data.sy, font=native.systemFont, font_size=100, align="center"})
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 

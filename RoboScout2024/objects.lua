@@ -25,28 +25,24 @@ local function calcIDNeed(max_num)
         id_need = id_need + 1
         digit = digit + 2
     end
-    print("Retval:"..tostring(id_need))
     return id_need
 end
 
 local function splitVals(num, ids)
-    --print("Val to split: "..tostring(num))
     local vals = {}
     for i=0,ids-1 do
         local short_num = (num/(10^(2*i)))
-        --print("Short Num: "..tostring(short_num))
-        vals[i] = math.fmod(short_num, 10^(2*i+2))
-        --print("Val "..tostring(i)..": "..tostring(vals[i]))
+        vals[i] = math.floor(math.fmod(short_num, 10^(2*i+2)))
+    end
+    if ids > 1 then
+        print("Id vals 3: "..tostring(vals[0]).." and 4: "..tostring(vals[1]))
     end
     return vals
 end
 
 local function setData(split_val, id, id_num)
-    print("Input data: "..tostring(split_val))
     for i=0,id_num-1 do
-        print("Value to save: "..tostring(split_val[i]))
         Data.recorded_data[id+i] = split_val[i]
-        print("Saved value: "..tostring(Data.recorded_data[id+i]))
     end
 end
 
@@ -115,7 +111,6 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
         self.id_val_text.text = tostring(data)
     end
 
-    --print(self.id_plus, self.tap_id_plus)
     self.id_plus:addEventListener("tap", self.tap_id_plus)
     self.id_minus:addEventListener("tap", self.tap_id_minus)
 
@@ -267,7 +262,6 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     for i=0,self.id_need-1 do
         add_id_key(id + i,key)
     end
-    --self.val = default_value
     self.def_found = false
     for i,v in ipairs(options) do
         if v == default_value then
@@ -277,8 +271,8 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
             break
         end
     end
-    if not def_found then
-        split = splitVals(0, self.id_need)
+    if not self.def_found then
+        split = splitVals(1, self.id_need)
         setData(split, id, self.id_need)
     end
 
@@ -291,7 +285,6 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     self.num_color = table.getn(colors)
     self.opt_per_row = math.floor(self.num_opt / num_rows)
     self.opt_buttons = {}
-    print("Total #: "..tostring(self.num_opt).." Rows: "..tostring(num_rows).." Opt per row: "..tostring(self.opt_per_row).." Color #: "..tostring(self.num_color))
     self.button_group = display.newGroup()
     self.button_group.x = self.select_text.x
     self.button_group.y = self.select_text.y + self.select_text.height + spac2
@@ -314,7 +307,6 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
             end
             local rad_off_asset = asset_loc.."radio_off.png"
             local rad_on_asset = asset_loc.."radio_on.png"
-            print("Index: "..tostring(idx).." Color: "..tostring(color))
             if color == "blue" then
                 rad_on_asset = asset_loc.."radio_blue.png"
             elseif color == "green" then
@@ -384,6 +376,11 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
     self.intext_text.anchorX=0.5
     self.intext_text:setFillColor(0,0,0)
 
+    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box.alpha=0
+    self.click_away_box.isHitTestable = true
+    self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
+
     self.text_input = native.newTextBox(lft_mrg, 0, 1, textbox_height)
     self.text_input.placeholder=text_hint
     self.text_input.anchorX=0
@@ -404,9 +401,23 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
         --if event.phase == "ended" or event.phase == "submitted" then
         if event.phase == "editing" then
             local data = event.text
+            if id ~= 99 then
+                id_start, id_end = string.find(data, tostring(id))
+                if id_start ~= nil then
+                    if id_start == 1 and id_end == string.len(data) then
+                        data = ""
+                    elseif id_start == 1 then
+                        data = string.sub(data, id_end+1, -1)
+                    elseif id_end == string.len(data) then
+                        data = string.sub(data, 1, id_start-1)
+                    else
+                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1, -1)
+                    end
+                end
+            end
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(tostring(data))
-        elseif event.pahse == "ended" then
+        elseif event.pahse == "submitted" then
             native.setKeyboardFocus(nil)
         end
     end
@@ -415,22 +426,51 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
     return self
 end
 
+ 
+
 FreeNumInput = {}
-function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num)
+function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num, def_val)
+    local self = setmetatable({}, FreeNumInput)
+    local function setInput(input_text)
+        local data = input_text
+        local data_num = tonumber(data, 10)
+        if data_num == nil then
+            data_num = -1
+        end
+        local id_idx = table.indexOf(Data.errors, id)
+        if data_num < min_num or data_num > max_num then
+            if id_idx == nil then
+                self.prompt_text:setFillColor(1,0,0)
+                table.insert(Data.errors, (id))
+                table.insert(Data.error_circle, {self.prompt_text.x + (self.prompt_text.width / 2), y_val, self.prompt_text.width, self.prompt_text.height})
+            end
+        else
+            if id_idx ~= Nil then
+                self.prompt_text:setFillColor(0,0,0)
+                table.remove(Data.errors, id_idx)
+                table.remove(Data.error_circle, id_idx)
+            end
+            local split = splitVals(data, self.id_need)
+            setData(split, id, self.id_need)
+            self.debug_text.text=tostring(data)
+        end
+    end
+
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
-    local self = setmetatable({}, FreeNumInput)
     self.id_need = calcIDNeed(max_num)
-    print("Recval:"..tostring(self.id_need))
     for i=0,self.id_need-1 do
         add_id_key(id + i,key)
-        Data.recorded_data[id+i] = 0
     end
-    --self.input_val = ""
 
     self.prompt_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.prompt_text.anchorX=0
     self.prompt_text:setFillColor(0,0,0)
+
+    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box.alpha=0
+    self.click_away_box.isHitTestable = true
+    self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
 
     self.line_input = native.newTextField(0, y_val, input_width, 1)
     self.line_input.anchorX=0
@@ -438,40 +478,119 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     self.line_input.height = self.prompt_text.height
     self.line_input.size = input_size
     self.line_input.placeholder=text_hint
-    self.line_input.input_type = "number"
+    self.line_input.inputType = "number"
+    if def_val ~= nil then
+        self.line_input.text = tostring(def_val)
+    end
 
     sceneGroup:insert(self.line_input)
 
-    self.debug_text = display.newText({parent=sceneGroup, text="", x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
+    self.debug_text = display.newText({parent=sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX = 0
     self.debug_text.x = self.line_input.x + self.line_input.width + spac1
     self.debug_text:setFillColor(0,0,0)
     self.debug_text.isVisible = show_debug_text
 
+    setInput(tostring(def_val))
+
+    self.text_enter = function(event)
+        local data = ""
+        if event.phase == "editing" then
+            setInput(event.text)
+        elseif event.phase == "submitted" then
+            native.setKeyboardFocus(nil)          
+        end
+    end
+
+    self.line_input:addEventListener("userInput", self.text_enter)
+    return self
+end
+
+SingleLineInput = {}
+function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_width, text_hint, input_size, def_val)
+    local self = setmetatable({}, SingleLineInput)
+    local function setInput(input_text)
+        local data = input_text
+        local id_idx = table.indexOf(Data.errors, id)
+        if data == nil or data == "" then
+            if id_idx == nil then
+                self.prompt_text:setFillColor(1,0,0)
+                table.insert(Data.errors, (id))
+                table.insert(Data.error_circle, {self.prompt_text.x + (self.prompt_text.width / 2), y_val, self.prompt_text.width, self.prompt_text.height})
+            end
+        else
+            if id_idx ~= Nil then
+                self.prompt_text:setFillColor(0,0,0)
+                table.remove(Data.errors, id_idx)
+                table.remove(Data.error_circle, id_idx)
+            end
+            if id ~= 99 then
+                id_start, id_end = string.find(data, tostring(99))
+                while id_start ~= nil do
+                    if id_start == 1 and id_end == string.len(data) then
+                        print("99 found and it is the full scouter name")
+                        data = ""
+                    elseif id_start == 1 then
+                        print("99 found at beginning of string")
+                        data = string.sub(data, id_end+1,-1)
+                    elseif id_end == string.len(data) then
+                        print("99 found at end of string")
+                        data = string.sub(data, 1, id_start-1)
+                    else
+                        print("99 found elsewhere")
+                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1,-1)
+                    end
+                    print("New string is "..data)
+                    id_start, id_end = string.find(data, tostring(99))
+                end
+            end
+            Data.recorded_data[id] = data
+            self.debug_text.text=tostring(data)
+        end
+    end
+
+    y_val = y_val + Data.sy
+    lft_mrg = lft_mrg + Data.sx
+    self.id_need = 1
+    add_id_key(id, key)
+
+    self.prompt_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.prompt_text.anchorX=0
+    self.prompt_text:setFillColor(0,0,0)
+
+    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box.alpha=0
+    self.click_away_box.isHitTestable = true
+    self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
+
+    self.line_input = native.newTextField(0, y_val, textbox_width, 1)
+    self.line_input.anchorX=0
+    self.line_input.x = self.prompt_text.x + self.prompt_text.width + spac1
+    self.line_input.height = self.prompt_text.height
+    self.line_input.size = input_size
+    self.line_input.placeholder=text_hint
+    self.line_input.input_type = "number"
+    if def_val ~= nil then
+        self.line_input.text = tostring(def_val)
+    end
+
+    sceneGroup:insert(self.line_input)
+
+    self.debug_text = display.newText({parent=sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
+    self.debug_text.anchorX = 0
+    self.debug_text.x = self.line_input.x + self.line_input.width + spac1
+    self.debug_text:setFillColor(0,0,0)
+    self.debug_text.isVisible = show_debug_text
+
+    setInput(def_val)
+
     self.text_enter = function(event)
         local data = ""
         if event.phase == "editing" then
             local data = event.text
-            local data_num = tonumber(data, 10)
-            if data_num == nil then
-                data_num = -1
-            end
-            local id_idx = table.indexOf(Data.errors, id)
-            if data_num < min_num or data_num > max_num then
-                if id_idx == nil then
-                    self.prompt_text:setFillColor(1,0,0)
-                    table.insert(Data.errors, (id))
-                    Data.error_circle = {self.prompt_text.x + (self.prompt_text.width / 2), y_val, self.prompt_text.width, self.prompt_text.height}
-                end
-            else
-                if id_idx ~= Nil then
-                    self.prompt_text:setFillColor(0,0,0)
-                    table.remove(Data.errors, id_idx)
-                end
-                local split = splitVals(data, self.id_need)
-                setData(split, id, self.id_need)
-                self.debug_text.text=tostring(data)
-            end            
+            setInput(data)
+        elseif event.phase == "submitted" then
+            native.setKeyboardFocus(nil)          
         end
     end
 
@@ -498,7 +617,7 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
             y = y_val + (ph*(i-1))
             for j,p in ipairs(r) do
                 x = x_val + (pw*(j-1))
-                print("Printing pixel ("..tostring(i)..","..tostring(j)..") with color "..tostring(p).." at ("..tostring(x)..","..tostring(y)..")")
+                --print("Printing pixel ("..tostring(i)..","..tostring(j)..") with color "..tostring(p).." at ("..tostring(x)..","..tostring(y)..")")
                 pixel = display.newRect(sceneGroup, x, y, pw, ph)
                 pixel.anchorX=0
                 pixel.anchorY=0
