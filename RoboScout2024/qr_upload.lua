@@ -1,8 +1,3 @@
------------------------------------------------------------------------------------------
---
--- auto_input.lua
---
------------------------------------------------------------------------------------------
 require "objects"
 require "data"
 
@@ -12,9 +7,9 @@ local notes_in_amp = 0
 local composer = require("composer")
 local scene = composer.newScene()
 
-local text_input = 0
 local captured_info
 local data_qr
+local popup
 
 -- -----------------------
 -- Generic Event Functions
@@ -39,6 +34,13 @@ local function start_next_match()
 	Data.ids = {}
 	composer.gotoScene("match_info")
 	composer.removeScene("qr_upload", true)
+end
+
+local function handle_reset(confirm)
+	display.remove(popup.popup_group)
+	if confirm then
+		start_next_match()
+	end
 end
 
 -- ---------------------
@@ -73,7 +75,8 @@ function scene:create(event)
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
-	next_match_button:addEventListener("tap", start_next_match)
+	--next_match_button:addEventListener("tap", start_next_match)
+	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
 	back_button:addEventListener("tap", go_back_screen)
 end
 

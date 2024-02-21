@@ -1,8 +1,3 @@
------------------------------------------------------------------------------------------
---
--- auto_input.lua
---
------------------------------------------------------------------------------------------
 require "objects"
 require "data"
 
@@ -69,10 +64,16 @@ function scene:create(event)
 	submit_button.y=Data.sh - 5 + Data.sy
 	submit_button:addEventListener("tap", function() submit_page(sceneGroup) end)
 
-	scout_name = Objects.SingleLineInput.init(sceneGroup, 98, "Scout Name", "Scout's name", 25, 60, 30, 10, 100, "Dr. Jerry", 15, tostring(Data.scout_name))
-	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,90,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")
-	match_num = Objects.FreeNumInput.init(sceneGroup, 1, "Match #","Match Number", 25, 200, 30, 15, 70, "0", 15, 0, 99,tonumber(Data.match_num))
-	local team_select = Objects.SingleSelect.init(sceneGroup, 2, "Team","Team Select", 25, 230, 0, 10, 10, 30, Data.teams_to_scout, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, Data.team_to_scout)
+	local history_button = display.newImageRect(sceneGroup, asset_loc.."history_button.png", 70, 35)
+	history_button.anchorY = 0
+	history_button.x = Data.sw/6
+	history_button.y = Data.sy + 20
+	history_button:addEventListener("tap", function() composer.gotoScene("qr_history") end)
+
+	scout_name = Objects.SingleLineInput.init(sceneGroup, 98, "Scout Name", "Scout's name", 25, 80, 30, 10, 100, "Dr. Jerry", 15, tostring(Data.scout_name))
+	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,100,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")
+	match_num = Objects.FreeNumInput.init(sceneGroup, 1, "Match #","Match Number", 25, 220, 30, 15, 70, "0", 15, 0, 99,tonumber(Data.match_num))
+	local team_select = Objects.SingleSelect.init(sceneGroup, 2, "Team","Team Select", 25, 250, 0, 10, 10, 30, Data.teams_to_scout, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, Data.team_to_scout)
 	team_num = Objects.FreeNumInput.init(sceneGroup, 3, "Team #","Team Number", 25, team_select.bottom_y + 40, 30, 10, 100, "254", 15, 0, 9789,"")
 end
 

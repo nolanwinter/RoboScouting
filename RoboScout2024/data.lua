@@ -72,6 +72,28 @@ function get_readable_data_peak_vert()
     return str
 end
 
+-- function get_history_peak_vert(history_data)
+--     local str = ""
+--     for i=0,2 do
+--         if ids[i] == true then
+--             data = Data.recorded_data[i]
+--             if i == 2 then
+--                 print("Printing team relating to id "..tostring(Data.recorded_data[i]))
+--                 data = Data.teams_to_scout[Data.recorded_data[i]]
+--             elseif i == 0 then
+--                 if Data.recorded_data[i] == 1 then
+--                     data = "Qual"
+--                 else
+--                     data = "Test"
+--                 end
+--             end
+--             str = str..(tostring(keys[i])..": "..tostring(data).."\n")
+--         end
+--     end
+--     str = str..tostring(keys[3])..": "..tostring(Data.recorded_data[4]*100 + Data.recorded_data[3])
+--     return str
+-- end
+
 function get_readable_data()
     local str = ""
     for i=0,99 do
