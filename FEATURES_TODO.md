@@ -14,9 +14,13 @@ Currently Implemented Features:
 - Scout name and team selector remain between matches
 - Use number-only keyboard for match and team number inputs
 - Keyboards are hidden when clicking away or pressing enter
+- Confirmation popup to prevent accidental match reset
+- View the last 50 QR codes
 
 TODO:
-- Create popup to confirm starting a new match
-- Add QR history view
 - Include proper attribution for qr code generator
+- Handle scenes that destroy themselves after a long time going unused (may not be important despite being a bug)
+- Make a sceneGroup variable in objects that gets set everytime a scene is created or shown and then remove that paramter from each display object
+- Turn all default display values (headings, etc.) into objects for cleaner, more readable scenes
+- Create top/bottom y and right/left x properties for each object
 - Handle negative numbers (currently not planned/needed)
