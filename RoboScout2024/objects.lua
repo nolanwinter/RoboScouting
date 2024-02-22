@@ -32,9 +32,6 @@ local function splitVals(num, ids)
         local short_num = (num/(10^(2*i)))
         vals[i] = math.floor(math.fmod(short_num, 10^(2*i+2)))
     end
-    if ids > 1 then
-        print("Id vals 3: "..tostring(vals[0]).." and 4: "..tostring(vals[1]))
-    end
     return vals
 end
 
@@ -400,19 +397,9 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
         if event.phase == "editing" then
             local data = event.text
             if id ~= 99 then
-                id_start, id_end = string.find(data, tostring(id))
-                if id_start ~= nil then
-                    if id_start == 1 and id_end == string.len(data) then
-                        data = ""
-                    elseif id_start == 1 then
-                        data = string.sub(data, id_end+1, -1)
-                    elseif id_end == string.len(data) then
-                        data = string.sub(data, 1, id_start-1)
-                    else
-                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1, -1)
-                    end
-                end
+                data = string.gsub(data, "9", "")
             end
+            data = string.gsub(data, "\n", " ")
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(tostring(data))
         elseif event.pahse == "submitted" then
@@ -523,24 +510,7 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
                 table.remove(Data.error_circle, id_idx)
             end
             if id ~= 99 then
-                id_start, id_end = string.find(data, tostring(99))
-                while id_start ~= nil do
-                    if id_start == 1 and id_end == string.len(data) then
-                        print("99 found and it is the full scouter name")
-                        data = ""
-                    elseif id_start == 1 then
-                        print("99 found at beginning of string")
-                        data = string.sub(data, id_end+1,-1)
-                    elseif id_end == string.len(data) then
-                        print("99 found at end of string")
-                        data = string.sub(data, 1, id_start-1)
-                    else
-                        print("99 found elsewhere")
-                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1,-1)
-                    end
-                    print("New string is "..data)
-                    id_start, id_end = string.find(data, tostring(99))
-                end
+                data = string.gsub(data, "9", "")
             end
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(data)
@@ -681,7 +651,6 @@ function PopUp.init(sceneGroup, msg, msg_size, no_text, yes_text, button_size, h
     self.height = self.message.height + math.max(self.no_text.height, self.yes_text.height) + (4*vert_spac)
     self.popup.height = self.height
     self.popup.path.radius = math.floor(0.1*math.min(self.popup.width, self.popup.height))
-    print("Popup radius "..tostring(self.popup.path.radius))
 
     -- Message placement
     self.y_top = self.popup.y - (self.popup.height / 2)

@@ -71,10 +71,14 @@ function scene:create(event)
 	local trap_made = Objects.Inc_Dec.init(sceneGroup, 44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
 	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
 
-	local defense_report = Objects.SingleSelect.init(sceneGroup, 46, "Defense", "Defensive Rating", 20, 255, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "Somewhat\nEffective", "\nDominant"}, 15, 1, {"black", "red", "blue", "green"}, "Did Not\nAttempt")
-	local endgame_report = Objects.SingleSelect.init(sceneGroup, 47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 10, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
+	local defense_report = Objects.SingleSelect.init(sceneGroup, 46, "Defense", "Defensive Rating", 20, 245, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
+	defense_clarification_str = "If they primarily played defense, please\ninclude more information on the next page."
+	local defense_note = display.newText({parent=sceneGroup, text=defense_clarification_str, x=display.contentCenterX,y=defense_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
+	defense_note.anchorY=0
+	defense_note:setFillColor(0.2,0.2,0.2)
+	local endgame_report = Objects.SingleSelect.init(sceneGroup, 47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 40, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
 	harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
-	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 10, font=native.systemFont, fontSize=13, align="center"})
+	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
 	harmony_note.anchorY=0
 	harmony_note:setFillColor(0.5,0.5,0.5)
 

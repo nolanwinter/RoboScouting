@@ -25,13 +25,16 @@ local function start_next_match()
 	composer.removeScene("tele_input", true)
 	composer.removeScene("info_submit", true)
 	Data.match_num = Data.recorded_data[1] + 1
-	print("Next match num "..Data.match_num)
 	Data.scout_name = Data.recorded_data[98]
 	Data.team_to_scout = Data.teams_to_scout[Data.recorded_data[2]]
 	Data.update_qr_history()
 	Data.save_history()
 	Data.recorded_data = {}
 	Data.ids = {}
+	ids = {}
+	for i=0, 99 do
+		ids[i] = false
+	end
 	composer.gotoScene("match_info")
 	composer.removeScene("qr_upload", true)
 end

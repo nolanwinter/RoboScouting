@@ -11,6 +11,7 @@ local captured_info
 local heading
 local data_qr
 local popup
+local history_spot = 0 --check if nil
 
 -- -----------------------
 -- Generic Event Functions
@@ -20,10 +21,54 @@ local function go_back_screen()
 	composer.gotoScene("match_info")
 end
 
-local function show_prev_qr()
-end
-
-local function show_next_qr()
+local function show_next_qr(forward, sceneGroup)
+	local dir = 1
+	if forward then
+		dir = -1
+	end
+	local history_check_count = 0
+	local checked = false
+	while (checked == false) or ((Data.data_history[history_spot] == nil or Data.data_history[history_spot] == "\n" or Data.data_history[history_spot] == "") and history_check_count < 50) do
+		history_check_count = history_check_count + 1
+		checked = true
+		history_spot = history_spot + dir
+		if history_spot > 50 then
+			history_spot = 1
+		elseif history_spot < 1 then
+			history_spot = 50
+		end
+	end
+	if history_check_count == 50 then
+		captured_info.text="No History\nto Display."
+		captured_info.size=40
+		return
+	end
+	if history_spot == 1 then
+		heading.text = "1 match ago"
+	else
+		heading.text = tostring(history_spot).." matches ago"
+	end
+	heading.size=20
+	data_lines = {}
+	for s in Data.data_history[history_spot]:gmatch("[^\r\n]+") do
+		table.insert(data_lines, s)
+	end
+	match_data = data_lines[3]
+	match_type = string.sub(match_data,3,4)
+	if match_type == 1 then
+		match_type = "Qual"
+	else
+		match_type = "Test"
+	end
+	peak_str = string.gsub(data_lines[1]," ","\n").."\n"..match_type.." Match\nMatch #"..tostring(string.sub(match_data,7,8)).."\n Team #"..tostring(string.sub(match_data,19,20))..tostring(string.sub(match_data,15,16))
+	captured_info.text=peak_str
+	captured_info.size=40
+	if data_qr ~= nil then
+		for i,p in ipairs(data_qr.pixels) do
+			display.remove(p)
+		end
+	end
+	data_qr = Objects.QRCode.init(sceneGroup, match_data, 250, (display.contentCenterX -(250/2)), Data.sh - 250 - 20)
 end
 
 -- ---------------------
@@ -69,6 +114,8 @@ function scene:create(event)
 	captured_info.anchorY=0
 
 	back_button:addEventListener("tap", go_back_screen)
+	prev_qr:addEventListener("tap", function() show_next_qr(false, sceneGroup) end)
+	next_qr:addEventListener("tap", function() show_next_qr(true, sceneGroup) end)
 end
 
 -- show()
@@ -79,18 +126,7 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-		--captured_info.text=Data.get_readable_data_peak_vert()
-		heading.text = "1 match ago"
-		heading.size=20
-		captured_info.size=35
-		data_lines = {}
-		for s in Data.data_history[1]:gmatch("[^\r\n]+") do
-			table.insert(data_lines, s)
-		end
-		print("Parsed History Data: "..tostring(data_lines[table.getn(data_lines)]))
-		data_qr = Objects.QRCode.init(sceneGroup, data_lines[table.getn(data_lines)], 250, (display.contentCenterX -(250/2)), 220)
-		print()
-		--Data.print_recorded_data()
+		show_next_qr(false, sceneGroup)
 		
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
