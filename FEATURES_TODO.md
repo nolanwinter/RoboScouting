@@ -22,5 +22,5 @@ TODO:
 - Handle scenes that destroy themselves after a long time going unused (may not be important despite being a bug)
 - Make a sceneGroup variable in objects that gets set everytime a scene is created or shown and then remove that paramter from each display object
 - Turn all default display values (headings, etc.) into objects for cleaner, more readable scenes
-- Create top/bottom y and right/left x properties for each object
+- Change all objects to use the top as a y_val (x_val can be either left or middle based on type of object?)
 - Handle negative numbers (currently not planned/needed)

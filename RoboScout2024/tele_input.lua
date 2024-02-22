@@ -81,7 +81,6 @@ function scene:create(event)
 	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
 	harmony_note.anchorY=0
 	harmony_note:setFillColor(0.5,0.5,0.5)
-
 end
 
 -- show()

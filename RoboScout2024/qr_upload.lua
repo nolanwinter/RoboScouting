@@ -94,8 +94,7 @@ function scene:show( event )
 		captured_info.text=Data.get_readable_data_peak_vert()
 		captured_info.size=35
 		data_qr = Objects.QRCode.init(sceneGroup, Data.get_data_short(), 250, (display.contentCenterX -(250/2)), 220)
-		Data.print_recorded_data()
-		
+		Data.print_recorded_data()		
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 

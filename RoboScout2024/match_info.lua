@@ -42,34 +42,6 @@ local function submit_page(sceneGroup)
 	end
 end
 
-local function reset_history(confirm)
-	display.remove(reset_popup.popup_group)
-	scout_name.line_input.isVisible = true
-	match_num.line_input.isVisible = true
-	team_num.line_input.isVisible = true
-	if confirm == true then
-		local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
-		local file, errorStr = io.open(path, "w")
-		if not file then
-			error("Could not find qr_history.txt.", 1)
-		else
-			io.close(file)
-		end
-		file = nil
-		data_history = {}
-		for i=1,100 do
-			data_history[i] = ""
-		end
-	end
-end
-
-local function confirm_reset(sceneGroup)
-	scout_name.line_input.isVisible = false
-	match_num.line_input.isVisible = false
-	team_num.line_input.isVisible = false
-	reset_popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to reset\nthe match history?\n\nWARNING: This action is irreversible.", 15, "Cancel", "Reset", 15, reset_history)
-end
-
 -- ---------------------
 -- Scene Event Functions
 -- ---------------------
@@ -98,12 +70,6 @@ function scene:create(event)
 	history_button.x = Data.sw/2
 	history_button.y = Data.sy + 10
 	history_button:addEventListener("tap", function() composer.gotoScene("qr_history") end)
-
-	local history_reset = display.newImageRect(sceneGroup, asset_loc.."reset_button.png", 25,25)
-	history_reset.anchorX = 0
-	history_reset.x = history_button.x + (history_button.width/2) + 5
-	history_reset.y = history_button.y + (history_button.height/2)
-	history_reset:addEventListener("tap", function() confirm_reset(sceneGroup) end)
 
 	scout_name = Objects.SingleLineInput.init(sceneGroup, 98, "Scout Name", "Scout's name", 25, 80, 30, 10, 100, "Dr. Jerry", 15, tostring(Data.scout_name))
 	local match_type = Objects.SingleSelect.init(sceneGroup,0,"Match type","Match Type",20,100,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")

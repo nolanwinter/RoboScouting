@@ -56,7 +56,7 @@ function scene:create(event)
 	auto_heading.anchorY=0
 	auto_heading:setFillColor(0,0,0)
 	
-	local test_radio_1 = Objects.Radio.init(sceneGroup,20,"Cross Line","Crossed\nStart Line?", 25, 170, 10, 20, 20, 13, 3, 40, true, false)
+	local crossed_start = Objects.Radio.init(sceneGroup,20,"Cross Line","Crossed\nStart Line?", 25, 170, 10, 20, 20, 13, 3, 40, true, false)
     
 	local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=230 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	speaker_heading.anchorY=0

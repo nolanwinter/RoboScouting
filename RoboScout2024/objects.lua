@@ -109,6 +109,13 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
     self.id_plus:addEventListener("tap", self.tap_id_plus)
     self.id_minus:addEventListener("tap", self.tap_id_minus)
 
+    self.top_y = y_val - (math.max(self.id_text.height,button_size)/2) - Data.sy
+    self.bottom_y = y_val + (math.max(self.id_text.height,button_size)/2) - Data.sy
+    self.left_x = self.id_text.x - Data.sx
+    self.right_x = self.id_plus.x + button_size - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
 
@@ -246,6 +253,19 @@ function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, sp
 
     self.rad_false_off:addEventListener("tap", self.tap_false)
     self.rad_true_off:addEventListener("tap", self.tap_true)
+
+    self.top_y = math.min(self.rad_text.y - (self.rad_text.height/2), self.no_lbl.y) - Data.sy
+    self.bottom_y = math.max(self.rad_text.y + (self.rad_text.height/2), self.rad_false_off.y) - Data.sy
+    self.left_x = self.rad_text.x - Data.sx
+    if self.no_lbl.width > self.rad_false_off.width then
+        self.right_x = self.no_lbl.x + self.no_lbl.width - Data.sx
+    else
+        self.right_x = self.rad_true_off.x + self.rad_true_off.width - Data.sx
+    end
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+    
+    return self
 end
 
 SingleSelect = {}
@@ -333,7 +353,6 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
                 y_val = y_val + temp_rad_lbl.height + temp_rad_on.height + (2*spac2)
             end
         end
-        self.bottom_y = self.button_group.y + self.button_group.height - Data.sy
     end
 
     self.select = function(idx)
@@ -356,6 +375,14 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
         v[2]:addEventListener("tap", function() self.select(i) end)
         v[3]:addEventListener("tap", function() self.select(i) end)
     end
+
+    self.top_y = self.select_text.y - Data.sy
+    self.bottom_y = self.button_group.y + self.button_group.height - Data.sy
+    self.left_x = math.min(self.select_text.x - (self.select_text.width/2), self.button_group.x - (self.button_group.width/2)) - Data.sx
+    self.right_x = math.max(self.select_text.x + (self.select_text.width/2), self.button_group.x + (self.button_group.width/2)) - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
 
@@ -385,6 +412,8 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
     self.text_input.isEditable=true
     self.text_input.size=input_size
 
+    sceneGroup:insert(self.text_input)
+
     self.debug_text = display.newText({parent=sceneGroup, text="", x=lft_mrg, y=0, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX=0
     self.debug_text.anchorY=0
@@ -408,10 +437,16 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
     end
 
     self.text_input:addEventListener("userInput", self.text_enter)
+
+    self.top_y = self.intext_text.y - (self.intext_text.height/2) - Data.sy
+    self.bottom_y = self.text_input.y + self.text_input.height - Data.sy
+    self.left_x = math.min(self.text_input.x, self.intext_text.x - (self.intext_text.width/2)) - Data.sx
+    self.right_x = math.max(self.text_input.x + self.text_input.width, self.intext_text.x + (self.intext_text.width/2)) - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
-
- 
 
 FreeNumInput = {}
 function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num, def_val)
@@ -488,6 +523,14 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     end
 
     self.line_input:addEventListener("userInput", self.text_enter)
+
+    self.top_y = self.prompt_text.y - (self.prompt_text.height/2) - Data.sy
+    self.bottom_y = self.prompt_text.y + (self.prompt_text.height/2) - Data.sy
+    self.left_x = self.prompt_text.x - Data.sx
+    self.right_x = self.line_input.x + self.line_input.width - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
 
@@ -563,6 +606,14 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
     end
 
     self.line_input:addEventListener("userInput", self.text_enter)
+
+    self.top_y = self.prompt_text.y - (self.prompt_text.height/2) - Data.sy
+    self.bottom_y = self.prompt_text.y + (self.prompt_text.height/2) - Data.sy
+    self.left_x = self.prompt_text.x - Data.sx
+    self.right_x = self.line_input.x + self.line_input.width - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
 
@@ -602,6 +653,14 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
             end
         end
     end
+
+    self.top_y = y_val - Data.sy
+    self.bottom_y = y_val + dim - Data.sy
+    self.left_x = x_val - Data.sx
+    self.right_x = x_val + dim - Data.sx
+    self.height = self.bottom_y - self.top_y
+    self.width = self.right_x - self.left_x
+
     return self
 end
 

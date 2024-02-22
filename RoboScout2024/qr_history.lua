@@ -68,7 +68,29 @@ local function show_next_qr(forward, sceneGroup)
 			display.remove(p)
 		end
 	end
-	data_qr = Objects.QRCode.init(sceneGroup, match_data, 250, (display.contentCenterX -(250/2)), Data.sh - 250 - 20)
+	data_qr = Objects.QRCode.init(sceneGroup, match_data, 250, (display.contentCenterX -(250/2)), Data.sh - 250 - 65)
+end
+
+local function reset_history(confirm)
+	display.remove(reset_popup.popup_group)
+	if confirm == true then
+		local path = system.pathForFile("qr_history.txt", system.DocumentsDirectory)
+		local file, errorStr = io.open(path, "w")
+		if not file then
+			error("Could not find qr_history.txt.", 1)
+		else
+			io.close(file)
+		end
+		file = nil
+		data_history = {}
+		for i=1,100 do
+			data_history[i] = ""
+		end
+	end
+end
+
+local function confirm_reset(sceneGroup)
+	reset_popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to reset\nthe match history?\n\nWARNING: This action is irreversible.", 15, "Cancel", "Reset", 15, reset_history)
 end
 
 -- ---------------------
@@ -87,11 +109,14 @@ function scene:create(event)
     local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
     background.fill = bckgnd_grad
 
-	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
+	local back_button = display.newImageRect(sceneGroup, asset_loc.."back_button_wide.png", 60, 30)
 	back_button.anchorX=0
 	back_button.anchorY=0
 	back_button.x=5 + Data.sx
 	back_button.y=5 + Data.sy
+
+	heading = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=back_button.y + (back_button.height/2), font=native.systemFont, font_size=30, align="center"})
+	heading:setFillColor(0,0,0)
 
 	local prev_qr = display.newImageRect(sceneGroup, asset_loc.."back_button.png", 30, 30)
 	prev_qr.anchorX=1
@@ -105,9 +130,12 @@ function scene:create(event)
 	next_qr.x = Data.sx + Data.sw - 5
 	next_qr.y = 5 + Data.sy
 
-	heading = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=Data.sy + 5, font=native.systemFont, font_size=30, align="center"})
-	heading.anchorY = 0
-	heading:setFillColor(0,0,0)
+	local history_reset = display.newImageRect(sceneGroup, asset_loc.."reset_button.png", 25,25)
+	history_reset.x = Data.sx + Data.sw - 30
+	history_reset.y = Data.sy + Data.sh - 20
+	history_reset.anchorX=1
+	history_reset.anchorY=1
+	history_reset:addEventListener("tap", function() confirm_reset(sceneGroup) end)
 
     captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=50 + Data.sy, font=native.systemFont, font_size=100, align="center"})
 	captured_info:setFillColor(0,0,0)
