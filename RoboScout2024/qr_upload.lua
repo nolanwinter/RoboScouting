@@ -1,8 +1,3 @@
------------------------------------------------------------------------------------------
---
--- auto_input.lua
---
------------------------------------------------------------------------------------------
 require "objects"
 require "data"
 
@@ -12,9 +7,9 @@ local notes_in_amp = 0
 local composer = require("composer")
 local scene = composer.newScene()
 
-local text_input = 0
 local captured_info
 local data_qr
+local popup
 
 -- -----------------------
 -- Generic Event Functions
@@ -30,15 +25,25 @@ local function start_next_match()
 	composer.removeScene("tele_input", true)
 	composer.removeScene("info_submit", true)
 	Data.match_num = Data.recorded_data[1] + 1
-	print("Next match num "..Data.match_num)
 	Data.scout_name = Data.recorded_data[98]
 	Data.team_to_scout = Data.teams_to_scout[Data.recorded_data[2]]
 	Data.update_qr_history()
 	Data.save_history()
 	Data.recorded_data = {}
 	Data.ids = {}
+	ids = {}
+	for i=0, 99 do
+		ids[i] = false
+	end
 	composer.gotoScene("match_info")
 	composer.removeScene("qr_upload", true)
+end
+
+local function handle_reset(confirm)
+	display.remove(popup.popup_group)
+	if confirm then
+		start_next_match()
+	end
 end
 
 -- ---------------------
@@ -73,7 +78,8 @@ function scene:create(event)
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
-	next_match_button:addEventListener("tap", start_next_match)
+	--next_match_button:addEventListener("tap", start_next_match)
+	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
 	back_button:addEventListener("tap", go_back_screen)
 end
 

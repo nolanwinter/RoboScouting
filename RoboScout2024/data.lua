@@ -56,7 +56,6 @@ function get_readable_data_peak_vert()
         if ids[i] == true then
             data = Data.recorded_data[i]
             if i == 2 then
-                print("Printing team relating to id "..tostring(Data.recorded_data[i]))
                 data = Data.teams_to_scout[Data.recorded_data[i]]
             elseif i == 0 then
                 if Data.recorded_data[i] == 1 then

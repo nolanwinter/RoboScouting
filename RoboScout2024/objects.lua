@@ -2,8 +2,6 @@ require "data"
 module("Objects", package.seeall)
 
 require "qrencode"
---qrencode = QREncode
---local qrencode = dofile("qrencode.lua")
 
 local show_debug_text = false
 
@@ -33,9 +31,6 @@ local function splitVals(num, ids)
     for i=0,ids-1 do
         local short_num = (num/(10^(2*i)))
         vals[i] = math.floor(math.fmod(short_num, 10^(2*i+2)))
-    end
-    if ids > 1 then
-        print("Id vals 3: "..tostring(vals[0]).." and 4: "..tostring(vals[1]))
     end
     return vals
 end
@@ -402,19 +397,9 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
         if event.phase == "editing" then
             local data = event.text
             if id ~= 99 then
-                id_start, id_end = string.find(data, tostring(id))
-                if id_start ~= nil then
-                    if id_start == 1 and id_end == string.len(data) then
-                        data = ""
-                    elseif id_start == 1 then
-                        data = string.sub(data, id_end+1, -1)
-                    elseif id_end == string.len(data) then
-                        data = string.sub(data, 1, id_start-1)
-                    else
-                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1, -1)
-                    end
-                end
+                data = string.gsub(data, "9", "")
             end
+            data = string.gsub(data, "\n", " ")
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(tostring(data))
         elseif event.pahse == "submitted" then
@@ -525,24 +510,7 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
                 table.remove(Data.error_circle, id_idx)
             end
             if id ~= 99 then
-                id_start, id_end = string.find(data, tostring(99))
-                while id_start ~= nil do
-                    if id_start == 1 and id_end == string.len(data) then
-                        print("99 found and it is the full scouter name")
-                        data = ""
-                    elseif id_start == 1 then
-                        print("99 found at beginning of string")
-                        data = string.sub(data, id_end+1,-1)
-                    elseif id_end == string.len(data) then
-                        print("99 found at end of string")
-                        data = string.sub(data, 1, id_start-1)
-                    else
-                        print("99 found elsewhere")
-                        data = string.sub(data, 1, id_start-1)..string.sub(data, id_end+1,-1)
-                    end
-                    print("New string is "..data)
-                    id_start, id_end = string.find(data, tostring(99))
-                end
+                data = string.gsub(data, "9", "")
             end
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(data)
@@ -607,12 +575,16 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
     self.pixels = {}
     if not ok then
         self.err_txt = display.newText({parent=sceneGroup, text="QR Code Failed to Generate.", x=lft_mrg, y=y_val, font=native.systemFont, fontSize=40, align="center"})
+        self.err_txt:setFillColor(0,0,0)
         print(tab_or_msg)
     else
-        col = table.getn(tab_or_msg)
-        row = table.getn(tab_or_msg[1])
-        pw = math.floor(dim/col + 0.5)
-        ph = math.floor(dim/row + 0.5)
+        local col = table.getn(tab_or_msg)
+        local row = table.getn(tab_or_msg[1])
+        local pw = math.floor(dim/col + 0.5)
+        local ph = math.floor(dim/row + 0.5)
+        local new_width = col * pw
+        local width_diff = new_width - dim
+        x_val = x_val - (width_diff/2)
         for i,r in ipairs(tab_or_msg) do
             y = y_val + (ph*(i-1))
             for j,p in ipairs(r) do
@@ -630,5 +602,84 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
             end
         end
     end
+    return self
+end
+
+PopUp = {}
+function PopUp.init(sceneGroup, msg, msg_size, no_text, yes_text, button_size, handle_method)
+    local self = setmetatable({}, PopUp)
+    self.popup_group = display.newGroup()
+    sceneGroup:insert(self.popup_group)
+
+    self.tap_catcher = display.newRect(self.popup_group, display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
+    self.tap_catcher:setFillColor(0,0,0)
+    self.tap_catcher.alpha = 0.4
+    --self.tap_catcher.isHitTestable = true
+    self.tap_catcher:addEventListener("tap", function() return true end)
+
+    self.popup = display.newRoundedRect(self.popup_group, display.contentCenterX, display.contentCenterY, 1, 1, 1)
+    self.popup:setFillColor(1,1,1)
+    self.popup:setStrokeColor(0,0,0)
+    self.popup.strokeWidth = 4
+
+    self.message = display.newText({parent=self.popup_group, text=msg, x=display.contentCenterX, y=display.contentCenterY, font=native.systemFont, fontSize=msg_size, align="center"})
+    self.message:setFillColor(0,0,0)
+
+    self.no_button = display.newRect(self.popup_group, display.contentCenterX, display.contentCenterY, 1, 1)
+    self.no_button:setFillColor(0,0.2,1)
+    self.no_button.alpha = 0
+    self.no_button.isHitTestable = true
+    self.no_button:addEventListener("tap", function() handle_method(false) end)
+
+    self.no_text = display.newText({parent=self.popup_group, text=no_text, x=display.contentCenterX, y=display.contentCenterY, font=native.systemFont, fontSize=button_size, align="center"})
+    self.no_text:setFillColor(0,0,0)
+
+    self.yes_button = display.newRect(self.popup_group, display.contentCenterX, display.contentCenterY, 1, 1)
+    self.yes_button:setFillColor(0,0.2,1)
+    self.yes_button.alpha = 0
+    self.yes_button.isHitTestable = true
+    self.yes_button:addEventListener("tap", function() handle_method(true) end)
+
+    self.yes_text = display.newText({parent=self.popup_group, text=yes_text, x=display.contentCenterX, y=display.contentCenterY, font=native.systemFont, fontSize=button_size, align="center"})
+    self.yes_text:setFillColor(0,0,0)
+
+    -- Popup dimensions
+    local horz_spac = 10
+    local vert_spac = 20
+    self.width = math.max(self.message.width + (2*horz_spac), self.no_text.width + self.yes_text.width + (4*horz_spac))
+    self.popup.width = self.width
+    self.height = self.message.height + math.max(self.no_text.height, self.yes_text.height) + (4*vert_spac)
+    self.popup.height = self.height
+    self.popup.path.radius = math.floor(0.1*math.min(self.popup.width, self.popup.height))
+
+    -- Message placement
+    self.y_top = self.popup.y - (self.popup.height / 2)
+    self.x_left = self.popup.x - (self.popup.width / 2)
+    self.message.y = self.y_top + vert_spac
+    self.message.anchorY=0
+
+    -- Button placement
+    self.button_height = math.max(self.no_text.height, self.yes_text.height)
+    self.no_text.y = self.y_top + self.message.height + (3*vert_spac)
+    self.no_text.anchorY=0
+    self.no_text.x = self.x_left + (self.width/2) - (self.width/4)
+    self.no_button.height = self.button_height + (2*vert_spac)
+    self.no_button.width = (self.width/2) - 5
+    self.no_button.y = self.y_top + self.message.height + (2*vert_spac)
+    self.no_button.anchorY=0
+    self.no_button.x = display.contentCenterX - 5
+    self.no_button.anchorX=1
+    self.yes_text.y = self.y_top + self.message.height + (3*vert_spac)
+    self.yes_text.anchorY=0
+    self.yes_text.x = self.x_left + (self.width/2) + (self.width/4)
+    self.yes_button.height = self.button_height + (2*vert_spac)
+    self.yes_button.width = (self.width/2) - 5
+    self.yes_button.y = self.y_top + self.message.height + (2*vert_spac)
+    self.yes_button.anchorY=0
+    self.yes_button.x = display.contentCenterX + 5
+    self.yes_button.anchorX=0
+    self.option_line = display.newLine(self.popup_group, display.contentCenterX, self.yes_button.y, display.contentCenterX, self.yes_button.y + self.yes_button.height)
+    self.option_line:setStrokeColor(0,0,0)
+    self.option_line.strokeWidth = 2
     return self
 end
