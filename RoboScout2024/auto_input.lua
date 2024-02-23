@@ -14,9 +14,25 @@ local scene = composer.newScene()
 		composer.gotoScene("match_info")
 	end
 
-	local function submit_page (sceneGroup)
+	local function flash_delay(time, circle)
+		circle.isVisible = false
+		timer.performWithDelay(time, function() circle.isVisible = true end)
+	end
+
+	local function flash_error(dim,time,blinks)
+		local err_cir = display.newRoundedRect(Objects.get_scene_group, dim[1], dim[2], dim[3]+10, dim[4], (math.min(dim[3],dim[4]) / 2))
+		local stroke = {1,0,0}
+		err_cir.stroke = stroke
+		err_cir.strokeWidth = 2
+		err_cir:setFillColor(0,0,0,0)
+		flash_delay(time, err_cir)
+		timer.performWithDelay(time*2, function() flash_delay(time, err_cir) end, blinks-1)
+		timer.performWithDelay(blinks*time*2, function() display.remove(err_cir) end)
+	end
+
+	local function submit_page()
 		if table.getn(Data.errors) > 0 then
-			flash_error(Data.error_circle, 200, 10, sceneGroup)
+			flash_error(Data.error_circle, 200, 10)
 		else
 			composer.gotoScene("tele_input")
 		end
@@ -27,6 +43,7 @@ local scene = composer.newScene()
 
 function scene:create(event)
     local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 
     local bckgnd_grad = {
         type = "gradient",
@@ -56,25 +73,26 @@ function scene:create(event)
 	auto_heading.anchorY=0
 	auto_heading:setFillColor(0,0,0)
 	
-	local crossed_start = Objects.Radio.init(sceneGroup,20,"Cross Line","Crossed\nStart Line?", 25, 170, 10, 20, 20, 13, 3, 40, true, false)
+	local crossed_start = Objects.Radio.init(20,"Cross Line","Crossed\nStart Line?", 25, 170, 10, 20, 20, 13, 3, 40, true, false)
     
 	local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=230 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	speaker_heading.anchorY=0
 	speaker_heading:setFillColor(0,0,0)
-	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 21, "Auto Speaker Made","Made",15,290,10,5,5,5,35,23,20,0,99)
-	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 22, "Atuo Speaker Miss","Missed",15,290,display.contentCenterX,5,5,5,35,23,20,0,99)
+	local speaker_made = Objects.Inc_Dec.init(21, "Auto Speaker Made","Made",15,290,10,5,5,5,35,23,20,0,99)
+	local speaker_miss = Objects.Inc_Dec.init(22, "Atuo Speaker Miss","Missed",15,290,display.contentCenterX,5,5,5,35,23,20,0,99)
 
 	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=320 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	amp_heading.anchorY=0
 	amp_heading:setFillColor(0,0,0)
-	local amp_made = Objects.Inc_Dec.init(sceneGroup, 23, "Auto Amp Made","Made",15,380,10,5,5,5,35,23,20,0,99)
-	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 24, "Auto Amp Miss","Missed",15,380,display.contentCenterX,5,5,5,35,23,20,0,99)
+	local amp_made = Objects.Inc_Dec.init(23, "Auto Amp Made","Made",15,380,10,5,5,5,35,23,20,0,99)
+	local amp_miss = Objects.Inc_Dec.init(24, "Auto Amp Miss","Missed",15,380,display.contentCenterX,5,5,5,35,23,20,0,99)
 end
 
 -- show()
 function scene:show( event )
 
 	local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 	local phase = event.phase
 
 	if ( phase == "will" ) then

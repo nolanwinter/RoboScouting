@@ -21,7 +21,7 @@ local function go_back_screen()
 	composer.gotoScene("match_info")
 end
 
-local function show_next_qr(forward, sceneGroup)
+local function show_next_qr(forward)
 	local dir = 1
 	if forward then
 		dir = -1
@@ -68,7 +68,7 @@ local function show_next_qr(forward, sceneGroup)
 			display.remove(p)
 		end
 	end
-	data_qr = Objects.QRCode.init(sceneGroup, match_data, 250, (display.contentCenterX -(250/2)), Data.sh - 250 - 65)
+	data_qr = Objects.QRCode.init(match_data, 250, (display.contentCenterX -(250/2)), Data.sh - 250 - 65)
 end
 
 local function reset_history(confirm)
@@ -89,8 +89,8 @@ local function reset_history(confirm)
 	end
 end
 
-local function confirm_reset(sceneGroup)
-	reset_popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to reset\nthe match history?\n\nWARNING: This action is irreversible.", 15, "Cancel", "Reset", 15, reset_history)
+local function confirm_reset()
+	reset_popup = Objects.PopUp.init("Are you sure you want to reset\nthe match history?\n\nWARNING: This action is irreversible.", 15, "Cancel", "Reset", 15, reset_history)
 end
 
 -- ---------------------
@@ -99,6 +99,7 @@ end
 
 function scene:create(event)
     local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 
     local bckgnd_grad = {
         type = "gradient",
@@ -135,26 +136,27 @@ function scene:create(event)
 	history_reset.y = Data.sy + Data.sh - 20
 	history_reset.anchorX=1
 	history_reset.anchorY=1
-	history_reset:addEventListener("tap", function() confirm_reset(sceneGroup) end)
+	history_reset:addEventListener("tap", confirm_reset)
 
     captured_info = display.newText({parent=sceneGroup, text="", x=display.contentCenterX, y=50 + Data.sy, font=native.systemFont, font_size=100, align="center"})
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
 	back_button:addEventListener("tap", go_back_screen)
-	prev_qr:addEventListener("tap", function() show_next_qr(false, sceneGroup) end)
-	next_qr:addEventListener("tap", function() show_next_qr(true, sceneGroup) end)
+	prev_qr:addEventListener("tap", function() show_next_qr(false) end)
+	next_qr:addEventListener("tap", function() show_next_qr(true) end)
 end
 
 -- show()
 function scene:show( event )
 
 	local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 	local phase = event.phase
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-		show_next_qr(false, sceneGroup)
+		show_next_qr(false)
 		
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen

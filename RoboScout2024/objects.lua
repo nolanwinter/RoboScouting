@@ -7,6 +7,16 @@ local show_debug_text = false
 
 local asset_loc = "Assets/"
 
+local _sceneGroup = nil
+
+function set_scene_group(sceneGroup)
+    _sceneGroup = sceneGroup
+end
+
+function get_scene_group()
+    return _sceneGroup
+end
+
 local function add_id_key(id,key)
     if Data.ids[id] then
         error("You cannot have two data objects sharing an id.", 3)
@@ -51,10 +61,11 @@ end
 
 
 Inc_Dec = {}
-function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, spac3, button_size, val_size, val_font_size, min_val, max_val)
+function Inc_Dec.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, spac3, button_size, val_size, val_font_size, min_val, max_val)
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, Inc_Dec)
+    self.sceneGroup = _sceneGroup
     self.id_need = calcIDNeed(max_val)
     self.def_val = min_val
     for i=0,self.id_need-1 do
@@ -63,29 +74,29 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
     end
     self.id_val = self.def_val
 
-    self.id_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg,y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.id_text = display.newText({parent=self.sceneGroup, text=val_text, x=lft_mrg,y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.id_text.anchorX=0
     self.id_text:setFillColor(0,0,0)
     
-    self.id_minus = display.newImageRect(sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
+    self.id_minus = display.newImageRect(self.sceneGroup, asset_loc.."red_minus.png", button_size, button_size)
     self.id_minus.anchorX=0
     self.id_minus.x=self.id_text.x + self.id_text.width + spac1
     self.id_minus.y=y_val
 
     local bkgd_height = math.max(self.id_text.height, button_size)
-    self.id_val_bkgd = display.newRoundedRect(sceneGroup, 0, 0, val_size, 0, 12)
+    self.id_val_bkgd = display.newRoundedRect(self.sceneGroup, 0, 0, val_size, 0, 12)
     self.id_val_bkgd.height=bkgd_height
     self.id_val_bkgd.anchorX=0
     self.id_val_bkgd.x=self.id_minus.x + self.id_minus.width + spac3
     self.id_val_bkgd.y=y_val
 
-    self.id_val_text = display.newText({parent=sceneGroup,text=tostring(self.id_val),x=0,y=0,font=native.systemFont,fontSize=val_font_size})
+    self.id_val_text = display.newText({parent=self.sceneGroup,text=tostring(self.id_val),x=0,y=0,font=native.systemFont,fontSize=val_font_size})
     self.id_val_text:setFillColor(0,0,0)
     self.id_val_text.anchorX=0.5
     self.id_val_text.x = self.id_val_bkgd.x + (self.id_val_bkgd.width/2)
     self.id_val_text.y = self.id_val_bkgd.y
 
-    self.id_plus = display.newImageRect(sceneGroup, asset_loc.."green_plus.png", button_size, button_size)
+    self.id_plus = display.newImageRect(self.sceneGroup, asset_loc.."green_plus.png", button_size, button_size)
     self.id_plus.anchorX=0
     self.id_plus.x=self.id_val_bkgd.x + self.id_val_bkgd.width + spac2
     self.id_plus.y=y_val
@@ -120,15 +131,16 @@ function Inc_Dec.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, 
 end
 
 Radio = {}
-function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, label_size, spac_lbl, radio_size, colored, default_val)
+function Radio.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, label_size, spac_lbl, radio_size, colored, default_val)
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, Radio)
+    self.sceneGroup = _sceneGroup
     add_id_key(id,key)
     Data.recorded_data[id] = (default_val and 1 or 0)
     --self.rad_val = default_val
 
-    self.rad_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.rad_text = display.newText({parent=self.sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.rad_text.anchorX=0
     self.rad_text:setFillColor(0,0,0)
 
@@ -141,14 +153,14 @@ function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, sp
         true_on_asset = asset_loc.."radio_green.png"
     end
 
-    self.no_lbl = display.newText({parent=sceneGroup, text="No",x=0,y=0,font=native.systemFont,fontSize=label_size,align="center"})
+    self.no_lbl = display.newText({parent=self.sceneGroup, text="No",x=0,y=0,font=native.systemFont,fontSize=label_size,align="center"})
     self.no_lbl:setFillColor(0,0,0)
-    self.yes_lbl = display.newText({parent=sceneGroup, text="Yes",x=0,y=0,font=native.systemFont,fontSize=label_size,align="center"})
+    self.yes_lbl = display.newText({parent=self.sceneGroup, text="Yes",x=0,y=0,font=native.systemFont,fontSize=label_size,align="center"})
     self.yes_lbl:setFillColor(0,0,0)
-    self.rad_false_off = display.newImageRect(sceneGroup, false_off_asset, radio_size, radio_size)
-    self.rad_false_on = display.newImageRect(sceneGroup, false_on_asset, radio_size, radio_size)
-    self.rad_true_off = display.newImageRect(sceneGroup, true_off_asset, radio_size, radio_size)
-    self.rad_true_on = display.newImageRect(sceneGroup, true_on_asset, radio_size, radio_size)
+    self.rad_false_off = display.newImageRect(self.sceneGroup, false_off_asset, radio_size, radio_size)
+    self.rad_false_on = display.newImageRect(self.sceneGroup, false_on_asset, radio_size, radio_size)
+    self.rad_true_off = display.newImageRect(self.sceneGroup, true_off_asset, radio_size, radio_size)
+    self.rad_true_on = display.newImageRect(self.sceneGroup, true_on_asset, radio_size, radio_size)
 
     self.no_height = self.no_lbl.height + self.rad_false_off.height + spac_lbl
     self.yes_height = self.yes_lbl.height + self.rad_true_off.height + spac_lbl
@@ -207,7 +219,7 @@ function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, sp
     self.rad_true_on.anchorX=self.rad_true_off.anchorX
     self.rad_true_on.x=self.rad_true_off.x
 
-    self.debug_text = display.newText({parent=sceneGroup, text=tostring(self.rad_val), x=lft_mrg, y=y_val, font=native.systemFont, fontSize=15, align="center"})
+    self.debug_text = display.newText({parent=self.sceneGroup, text=tostring(self.rad_val), x=lft_mrg, y=y_val, font=native.systemFont, fontSize=15, align="center"})
     self.debug_text.anchorX=0
     self.debug_text.x=self.yes_x + self.yes_width + 15
     self.debug_text:setFillColor(0,0,0)
@@ -269,10 +281,11 @@ function Radio.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, sp
 end
 
 SingleSelect = {}
-function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, radio_size, options, opt_font_size, num_rows, colors, default_value)
+function SingleSelect.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2, radio_size, options, opt_font_size, num_rows, colors, default_value)
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, SingleSelect)
+    self.sceneGroup = _sceneGroup
     self.id_need = calcIDNeed(table.getn(options))
     for i=0,self.id_need-1 do
         add_id_key(id + i,key)
@@ -291,7 +304,7 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
         setData(split, id, self.id_need)
     end
 
-    self.select_text = display.newText({parent=sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.select_text = display.newText({parent=self.sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.select_text.anchorX=0.5
     self.select_text.anchorY=0
     self.select_text:setFillColor(0,0,0)
@@ -306,7 +319,7 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
     self.button_group.anchorX=0.5
     self.button_group.anchorY=0
     self.button_group.anchorChildren=true
-    sceneGroup:insert(self.button_group)
+    self.sceneGroup:insert(self.button_group)
 
     y_val = 0
     for r=1,num_rows do
@@ -387,18 +400,19 @@ function SingleSelect.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
 end
 
 TextInput = {}
-function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
+function TextInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
-    local self =setmetatable({}, TextInput)
+    local self = setmetatable({}, TextInput)
+    self.sceneGroup = _sceneGroup
     add_id_key(id,key)
     Data.recorded_data[id] = ""
 
-    self.intext_text = display.newText({parent=sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.intext_text = display.newText({parent=self.sceneGroup, text=val_text, x=display.contentCenterX, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.intext_text.anchorX=0.5
     self.intext_text:setFillColor(0,0,0)
 
-    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box = display.newRect(self.sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
     self.click_away_box.alpha=0
     self.click_away_box.isHitTestable = true
     self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
@@ -412,9 +426,9 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
     self.text_input.isEditable=true
     self.text_input.size=input_size
 
-    sceneGroup:insert(self.text_input)
+    self.sceneGroup:insert(self.text_input)
 
-    self.debug_text = display.newText({parent=sceneGroup, text="", x=lft_mrg, y=0, font=native.systemFont, fontSize=12, align="left"})
+    self.debug_text = display.newText({parent=self.sceneGroup, text="", x=lft_mrg, y=0, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX=0
     self.debug_text.anchorY=0
     self.debug_text.y = self.text_input.y + self.text_input.height + 15
@@ -449,8 +463,9 @@ function TextInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg
 end
 
 FreeNumInput = {}
-function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num, def_val)
+function FreeNumInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, input_width, text_hint, input_size, min_num, max_num, def_val)
     local self = setmetatable({}, FreeNumInput)
+    self.sceneGroup = _sceneGroup
     local function setInput(input_text)
         local data = input_text
         local data_num = tonumber(data, 10)
@@ -483,11 +498,11 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
         add_id_key(id + i,key)
     end
 
-    self.prompt_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.prompt_text = display.newText({parent=self.sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.prompt_text.anchorX=0
     self.prompt_text:setFillColor(0,0,0)
 
-    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box = display.newRect(self.sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
     self.click_away_box.alpha=0
     self.click_away_box.isHitTestable = true
     self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
@@ -503,9 +518,9 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
         self.line_input.text = tostring(def_val)
     end
 
-    sceneGroup:insert(self.line_input)
+    self.sceneGroup:insert(self.line_input)
 
-    self.debug_text = display.newText({parent=sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
+    self.debug_text = display.newText({parent=self.sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX = 0
     self.debug_text.x = self.line_input.x + self.line_input.width + spac1
     self.debug_text:setFillColor(0,0,0)
@@ -535,8 +550,9 @@ function FreeNumInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_
 end
 
 SingleLineInput = {}
-function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_width, text_hint, input_size, def_val)
+function SingleLineInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_width, text_hint, input_size, def_val)
     local self = setmetatable({}, SingleLineInput)
+    self.sceneGroup = _sceneGroup
     local function setInput(input_text)
         local data = input_text
         local id_idx = table.indexOf(Data.errors, id)
@@ -565,11 +581,11 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
     self.id_need = 1
     add_id_key(id, key)
 
-    self.prompt_text = display.newText({parent=sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
+    self.prompt_text = display.newText({parent=self.sceneGroup, text=val_text, x=lft_mrg, y=y_val, font=native.systemFont, fontSize=font_size, align="center"})
     self.prompt_text.anchorX=0
     self.prompt_text:setFillColor(0,0,0)
 
-    self.click_away_box = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
+    self.click_away_box = display.newRect(self.sceneGroup,display.contentCenterX,display.contentCenterX,display.actualContentWidth,display.actualContentHeight)
     self.click_away_box.alpha=0
     self.click_away_box.isHitTestable = true
     self.click_away_box:addEventListener("tap", function() native.setKeyboardFocus(nil) end)
@@ -585,9 +601,9 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
         self.line_input.text = tostring(def_val)
     end
 
-    sceneGroup:insert(self.line_input)
+    self.sceneGroup:insert(self.line_input)
 
-    self.debug_text = display.newText({parent=sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
+    self.debug_text = display.newText({parent=self.sceneGroup, text=tostring(def_val), x=0, y=y_val, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX = 0
     self.debug_text.x = self.line_input.x + self.line_input.width + spac1
     self.debug_text:setFillColor(0,0,0)
@@ -618,14 +634,15 @@ function SingleLineInput.init(sceneGroup, id, key, val_text, font_size, y_val, l
 end
 
 QRCode = {}
-function QRCode.init(sceneGroup, data, dim, x_val, y_val)
+function QRCode.init(data, dim, x_val, y_val)
     y_val = y_val + Data.sy
     x_val = x_val + Data.sx
     local self = setmetatable({}, QRCode)
+    self.sceneGroup = _sceneGroup
     local ok, tab_or_msg = QREncode.qrcode(data)
     self.pixels = {}
     if not ok then
-        self.err_txt = display.newText({parent=sceneGroup, text="QR Code Failed to Generate.", x=lft_mrg, y=y_val, font=native.systemFont, fontSize=40, align="center"})
+        self.err_txt = display.newText({parent=self.sceneGroup, text="QR Code Failed to Generate.", x=lft_mrg, y=y_val, font=native.systemFont, fontSize=40, align="center"})
         self.err_txt:setFillColor(0,0,0)
         print(tab_or_msg)
     else
@@ -641,7 +658,7 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
             for j,p in ipairs(r) do
                 x = x_val + (pw*(j-1))
                 --print("Printing pixel ("..tostring(i)..","..tostring(j)..") with color "..tostring(p).." at ("..tostring(x)..","..tostring(y)..")")
-                pixel = display.newRect(sceneGroup, x, y, pw, ph)
+                pixel = display.newRect(self.sceneGroup, x, y, pw, ph)
                 pixel.anchorX=0
                 pixel.anchorY=0
                 if p > 0 then
@@ -665,10 +682,11 @@ function QRCode.init(sceneGroup, data, dim, x_val, y_val)
 end
 
 PopUp = {}
-function PopUp.init(sceneGroup, msg, msg_size, no_text, yes_text, button_size, handle_method)
+function PopUp.init(msg, msg_size, no_text, yes_text, button_size, handle_method)
     local self = setmetatable({}, PopUp)
+    self.sceneGroup = _sceneGroup
     self.popup_group = display.newGroup()
-    sceneGroup:insert(self.popup_group)
+    self.sceneGroup:insert(self.popup_group)
 
     self.tap_catcher = display.newRect(self.popup_group, display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
     self.tap_catcher:setFillColor(0,0,0)

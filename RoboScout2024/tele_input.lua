@@ -14,9 +14,25 @@ local function go_back_screen()
 	composer.gotoScene("auto_input")
 end
 
-local function submit_page (sceneGroup)
+local function flash_delay(time, circle)
+	circle.isVisible = false
+	timer.performWithDelay(time, function() circle.isVisible = true end)
+end
+
+local function flash_error(dim,time,blinks)
+	local err_cir = display.newRoundedRect(Objects.get_scene_group, dim[1], dim[2], dim[3]+10, dim[4], (math.min(dim[3],dim[4]) / 2))
+	local stroke = {1,0,0}
+	err_cir.stroke = stroke
+	err_cir.strokeWidth = 2
+	err_cir:setFillColor(0,0,0,0)
+	flash_delay(time, err_cir)
+    timer.performWithDelay(time*2, function() flash_delay(time, err_cir) end, blinks-1)
+	timer.performWithDelay(blinks*time*2, function() display.remove(err_cir) end)
+end
+
+local function submit_page ()
 	if table.getn(Data.errors) > 0 then
-		flash_error(Data.error_circle, 200, 10, sceneGroup)
+		flash_error(Data.error_circle, 200, 10)
 	else
 		composer.gotoScene("info_submit")
 	end
@@ -28,6 +44,7 @@ end
 
 function scene:create(event)
     local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 
     local bckgnd_grad = {
         type = "gradient",
@@ -56,27 +73,27 @@ function scene:create(event)
     local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=30 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	speaker_heading.anchorY=0
 	speaker_heading:setFillColor(0,0,0)
-	local speaker_made = Objects.Inc_Dec.init(sceneGroup, 40, "Speaker Shots Made","Made",15,80,10,5,5,5,30,23,20,0,10)
-	local speaker_miss = Objects.Inc_Dec.init(sceneGroup, 41, "Speaker Shots Miss","Missed",15,80,display.contentCenterX,5,5,5,30,23,20,0,10)
+	local speaker_made = Objects.Inc_Dec.init(40, "Speaker Shots Made","Made",15,80,10,5,5,5,30,23,20,0,10)
+	local speaker_miss = Objects.Inc_Dec.init(41, "Speaker Shots Miss","Missed",15,80,display.contentCenterX,5,5,5,30,23,20,0,10)
 
-	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
+	local amp_heading = display.newText({parent=sceneGroup,text="Amp Shots", x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	amp_heading.anchorY=0
 	amp_heading:setFillColor(0,0,0)
-	local amp_made = Objects.Inc_Dec.init(sceneGroup, 42, "Amp Shots Made","Made",15,150,10,5,5,5,30,23,20,0,10)
-	local amp_miss = Objects.Inc_Dec.init(sceneGroup, 43, "Amp Shots Miss","Missed",15,150,display.contentCenterX,5,5,5,30,23,20,0,10)
+	local amp_made = Objects.Inc_Dec.init(42, "Amp Shots Made","Made",15,150,10,5,5,5,30,23,20,0,10)
+	local amp_miss = Objects.Inc_Dec.init(43, "Amp Shots Miss","Missed",15,150,display.contentCenterX,5,5,5,30,23,20,0,10)
 
-	local trap_heading = display.newText({parent=sceneGroup, text="Trap Shots", x=display.contentCenterX,y=170 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
+	local trap_heading = display.newText({parent=sceneGroup,text="Trap Shots", x=display.contentCenterX,y=170 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	trap_heading.anchorY=0
 	trap_heading:setFillColor(0,0,0)
-	local trap_made = Objects.Inc_Dec.init(sceneGroup, 44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
-	local trap_miss = Objects.Inc_Dec.init(sceneGroup, 45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
+	local trap_made = Objects.Inc_Dec.init(44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
+	local trap_miss = Objects.Inc_Dec.init(45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
 
-	local defense_report = Objects.SingleSelect.init(sceneGroup, 46, "Defense", "Defensive Rating", 20, 245, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
+	local defense_report = Objects.SingleSelect.init(46, "Defense", "Defensive Rating", 20, 245, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
 	defense_clarification_str = "If they primarily played defense, please\ninclude more information on the next page."
 	local defense_note = display.newText({parent=sceneGroup, text=defense_clarification_str, x=display.contentCenterX,y=defense_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
 	defense_note.anchorY=0
 	defense_note:setFillColor(0.2,0.2,0.2)
-	local endgame_report = Objects.SingleSelect.init(sceneGroup, 47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 40, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
+	local endgame_report = Objects.SingleSelect.init(47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 40, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
 	harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
 	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
 	harmony_note.anchorY=0
@@ -87,6 +104,7 @@ end
 function scene:show( event )
 
 	local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 	local phase = event.phase
 
 	if ( phase == "will" ) then

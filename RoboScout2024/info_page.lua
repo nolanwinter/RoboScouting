@@ -1,4 +1,5 @@
 require "objects"
+require "data"
 
 local asset_loc = "Assets/"
 local notes_in_amp = 0
@@ -6,38 +7,16 @@ local notes_in_amp = 0
 local composer = require("composer")
 local scene = composer.newScene()
 
-local text_input = 0
+local match_num = nil
+local scout_name = nil
+local reset_popup = nil
 
 -- -----------------------
 -- Generic Event Functions
 -- -----------------------
 
 local function go_back_screen()
-	composer.gotoScene("tele_input")
-end
-
-local function flash_delay(time, circle)
-	circle.isVisible = false
-	timer.performWithDelay(time, function() circle.isVisible = true end)
-end
-
-local function flash_error(dim,time,blinks)
-	local err_cir = display.newRoundedRect(Objects.get_scene_group, dim[1], dim[2], dim[3]+10, dim[4], (math.min(dim[3],dim[4]) / 2))
-	local stroke = {1,0,0}
-	err_cir.stroke = stroke
-	err_cir.strokeWidth = 2
-	err_cir:setFillColor(0,0,0,0)
-	flash_delay(time, err_cir)
-    timer.performWithDelay(time*2, function() flash_delay(time, err_cir) end, blinks-1)
-	timer.performWithDelay(blinks*time*2, function() display.remove(err_cir) end)
-end
-
-local function submit_page ()
-	if table.getn(Data.errors) > 0 then
-		flash_error(Data.error_circle, 200, 10)
-	else
-		composer.gotoScene("qr_upload")
-	end
+    composer.gotoScene("match_info")
 end
 
 -- ---------------------
@@ -62,16 +41,30 @@ function scene:create(event)
 	back_button.anchorY=0
 	back_button.x=5 + Data.sx
 	back_button.y=5 + Data.sy
+    back_button:addEventListener("tap", go_back_screen)
 
-	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
-	submit_button.anchorX=0.5
-	submit_button.anchorY=1
-	submit_button.x=display.contentCenterX
-	submit_button.y=Data.sh - 5 + Data.sy
-
-    text_input = Objects.TextInput.init(99,"Team notes","Any additional notes?\n(e.g. robot was disabled)\nLeave empty if there's\nnothing to add.", 20, 110, 10, 20, 250, "Test hint.", 18)
-	back_button:addEventListener("tap", go_back_screen)
-	submit_button:addEventListener("tap", submit_page)
+    local info_str_1 = "Created by Nolan Winter,\nan alum of FRC Team 7103\n\nQR Generator Copyright\n(c) 2012-2020,\nPatrick Gundlach and contributors, see"
+    local link_str_1 = "https://github.com/speedata/luaqrcode"
+    local info_str_2 = "All rights reserved.\n\nFor full copyright, see"
+    local link_str_2 = "https://github.com/nolanwinter/\nRoboScouting/blob/main/README.md"
+    local info_1 = display.newText({parent=sceneGroup, text=info_str_1, x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=15, align="center"})
+    info_1.anchorY=0
+    info_1:setFillColor(0,0,0)
+    local link_1 = display.newText({parent=sceneGroup, text=link_str_1..".", x=display.contentCenterX,y=info_1.y+info_1.height, font=native.systemFont, fontSize=15, align="center"})
+    link_1.anchorY=0
+    link_1:setFillColor(0.2,0.2,0.2)
+    local link_1_line = display.newLine( sceneGroup, link_1.x - (link_1.width/2), link_1.y + link_1.height, link_1.x + (link_1.width/2), link_1.y + link_1.height)
+    link_1_line:setStrokeColor(0.2,0.2,0.2)
+    local info_2 = display.newText({parent=sceneGroup, text=info_str_2, x=display.contentCenterX,y=link_1.y+link_1.height, font=native.systemFont, fontSize=15, align="center"})
+    info_2.anchorY=0
+    info_2:setFillColor(0,0,0)
+    local link_2 = display.newText({parent=sceneGroup, text=link_str_2..".", x=display.contentCenterX,y=info_2.y+info_2.height, font=native.systemFont, fontSize=15, align="center"})
+    link_2.anchorY=0
+    link_2:setFillColor(0.2,0.2,0.2)
+    local link_2_line = display.newLine( sceneGroup, link_2.x - (link_2.width/2), link_2.y + link_2.height, link_2.x + (link_2.width/2), link_2.y + link_2.height)
+    link_2_line:setStrokeColor(0.2,0.2,0.2)
+    link_1:addEventListener("tap", function() system.openURL(link_str_1) end)
+    link_2:addEventListener("tap", function() system.openURL(link_str_2) end)
 end
 
 -- show()
@@ -83,7 +76,7 @@ function scene:show( event )
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
-		text_input.text_input.isVisible=true
+
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
 
@@ -102,7 +95,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-		text_input.text_input.isVisible=false
+
 	end
 end
 
@@ -112,7 +105,7 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+	
 end
 
 

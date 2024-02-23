@@ -52,6 +52,7 @@ end
 
 function scene:create(event)
     local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 
     local bckgnd_grad = {
         type = "gradient",
@@ -79,7 +80,7 @@ function scene:create(event)
 	captured_info.anchorY=0
 
 	--next_match_button:addEventListener("tap", start_next_match)
-	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init(sceneGroup, "Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
+	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init("Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
 	back_button:addEventListener("tap", go_back_screen)
 end
 
@@ -87,13 +88,14 @@ end
 function scene:show( event )
 
 	local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 	local phase = event.phase
 
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		captured_info.text=Data.get_readable_data_peak_vert()
 		captured_info.size=35
-		data_qr = Objects.QRCode.init(sceneGroup, Data.get_data_short(), 250, (display.contentCenterX -(250/2)), 220)
+		data_qr = Objects.QRCode.init(Data.get_data_short(), 250, (display.contentCenterX -(250/2)), 220)
 		Data.print_recorded_data()		
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen
