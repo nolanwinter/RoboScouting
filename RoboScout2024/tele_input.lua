@@ -88,16 +88,41 @@ function scene:create(event)
 	local trap_made = Objects.Inc_Dec.init(44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
 	local trap_miss = Objects.Inc_Dec.init(45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
 
-	local defense_report = Objects.SingleSelect.init(46, "Defense", "Defensive Rating", 20, 245, 10, 5, 3, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
-	defense_clarification_str = "If they primarily played defense, please\ninclude more information on the next page."
-	local defense_note = display.newText({parent=sceneGroup, text=defense_clarification_str, x=display.contentCenterX,y=defense_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
-	defense_note.anchorY=0
-	defense_note:setFillColor(0.2,0.2,0.2)
-	local endgame_report = Objects.SingleSelect.init(47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 40, 10, 5, 3, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
-	harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
-	local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 5, font=native.systemFont, fontSize=13, align="center"})
-	harmony_note.anchorY=0
-	harmony_note:setFillColor(0.5,0.5,0.5)
+	local hint_size = 0
+	if Data.tele_hint_size == nil then
+		hint_size = 15
+	else
+		hint_size = Data.tele_hint_size
+	end
+	local sized = false
+	while not sized do
+		local defense_report = Objects.SingleSelect.init(46, "Defense", "Defensive Rating", 20, 245, 10, 5, 1, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
+		defense_clarification_str = "If they primarily played defense, please\ninclude more information on the next page."
+		local defense_note = display.newText({parent=sceneGroup, text=defense_clarification_str, x=display.contentCenterX,y=defense_report.bottom_y + Data.sy + 3, font=native.systemFont, fontSize=hint_size, align="center"})
+		defense_note.anchorY=0
+		defense_note:setFillColor(0.2,0.2,0.2)
+		local endgame_report = Objects.SingleSelect.init(47, "Endgame", "Climb Result", 20, defense_note.y + defense_note.height + 5 - Data.sy, 10, 5, 1, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
+		harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
+		local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 3, font=native.systemFont, fontSize=hint_size, align="center"})
+		harmony_note.anchorY=0
+		harmony_note:setFillColor(0.5,0.5,0.5)
+		harm_note_bot_y = (harmony_note.y + harmony_note.height)
+		submit_top_y = (submit_button.y - submit_button.height)
+		print("Note bottom:"..tostring(harm_note_bot_y).." Button top:"..tostring(submit_top_y))
+		if (harm_note_bot_y > submit_top_y) then
+			print("Lowering hint size.")
+			hint_size = hint_size - 1
+			defense_report.remove()
+			display.remove(defense_note)
+			endgame_report.remove()
+			display.remove(harmony_note)
+			Data.ids[46] = false
+			Data.ids[47] = false
+		else
+			Data.tele_hint_size = hint_size
+			sized = true
+		end
+	end
 end
 
 -- show()
@@ -138,7 +163,12 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+	Data.ids[40] = false
+	Data.ids[41] = false
+	Data.ids[42] = false
+	Data.ids[43] = false
+	Data.ids[44] = false
+	Data.ids[45] = false
 end
 
 

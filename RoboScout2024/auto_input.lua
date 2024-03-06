@@ -126,7 +126,11 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-
+	Data.ids[20] = false
+	Data.ids[21] = false
+	Data.ids[22] = false
+	Data.ids[23] = false
+	Data.ids[24] = false
 end
 
 

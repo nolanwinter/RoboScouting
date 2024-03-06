@@ -28,7 +28,7 @@ local function show_next_qr(forward)
 	end
 	local history_check_count = 0
 	local checked = false
-	while (checked == false) or ((Data.data_history[history_spot] == nil or Data.data_history[history_spot] == "\n" or Data.data_history[history_spot] == "") and history_check_count < 50) do
+	while (checked == false) or ((Data.data_history[history_spot] == nil or Data.data_history[history_spot] == "\n" or Data.data_history[history_spot] == "") and history_check_count < 51) do
 		history_check_count = history_check_count + 1
 		checked = true
 		history_spot = history_spot + dir
@@ -38,7 +38,7 @@ local function show_next_qr(forward)
 			history_spot = 50
 		end
 	end
-	if history_check_count == 50 then
+	if history_check_count > 50 then
 		captured_info.text="No History\nto Display."
 		captured_info.size=40
 		return
@@ -82,10 +82,11 @@ local function reset_history(confirm)
 			io.close(file)
 		end
 		file = nil
-		data_history = {}
+		Data.data_history = {}
 		for i=1,100 do
-			data_history[i] = ""
+			Data.data_history[i] = ""
 		end
+		next_qr(false)
 	end
 end
 

@@ -3,8 +3,10 @@ module("Data", package.seeall)
 local topInset, leftInset, bottomInset, rightInset = display.getSafeAreaInsets()
 sx = display.screenOriginX + leftInset
 sy = display.screenOriginY + topInset
-sw = display.actualContentWidth - ( leftInset + rightInset )
-sh = display.actualContentHeight - ( topInset + bottomInset )
+sw = display.actualContentWidth - (leftInset + rightInset)
+sh = display.actualContentHeight - (topInset + bottomInset)
+
+tele_hint_size = nil
 
 ids = {}
 for i=0, 99 do

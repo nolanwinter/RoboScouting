@@ -10,6 +10,7 @@ local scene = composer.newScene()
 local captured_info
 local data_qr
 local popup
+local qr_size
 
 -- -----------------------
 -- Generic Event Functions
@@ -31,10 +32,11 @@ local function start_next_match()
 	Data.save_history()
 	Data.recorded_data = {}
 	Data.ids = {}
-	ids = {}
-	for i=0, 99 do
-		ids[i] = false
-	end
+	-- REPLACED BY SETTING TO FALSE IN EACH SCENE DESTROY OPTION
+	-- ids = {}
+	-- for i=0, 99 do
+	-- 	ids[i] = false
+	-- end
 	composer.gotoScene("match_info")
 	composer.removeScene("qr_upload", true)
 end
@@ -79,6 +81,8 @@ function scene:create(event)
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
+	qr_size = math.min(Data.sw - 10, (next_match_button.y - next_match_button.height) - (captured_info.y + captured_info.height) - 10)
+
 	--next_match_button:addEventListener("tap", start_next_match)
 	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init("Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
 	back_button:addEventListener("tap", go_back_screen)
@@ -95,7 +99,7 @@ function scene:show( event )
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		captured_info.text=Data.get_readable_data_peak_vert()
 		captured_info.size=35
-		data_qr = Objects.QRCode.init(Data.get_data_short(), 250, (display.contentCenterX -(250/2)), 220)
+		data_qr = Objects.QRCode.init(Data.get_data_short(), qr_size, (display.contentCenterX -(qr_size/2)), captured_info.y + captured_info.height + 5 - Data.sy)
 		Data.print_recorded_data()		
 	elseif ( phase == "did" ) then
 		-- Code here runs when the scene is entirely on screen

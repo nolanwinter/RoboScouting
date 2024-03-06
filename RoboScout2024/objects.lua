@@ -396,6 +396,11 @@ function SingleSelect.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, 
     self.height = self.bottom_y - self.top_y
     self.width = self.right_x - self.left_x
 
+    self.remove = function()
+        display.remove(self.select_text)
+        display.remove(self.button_group)
+    end
+
     return self
 end
 
@@ -596,7 +601,6 @@ function SingleLineInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac
     self.line_input.height = self.prompt_text.height
     self.line_input.size = input_size
     self.line_input.placeholder=text_hint
-    self.line_input.input_type = "number"
     if def_val ~= nil then
         self.line_input.text = tostring(def_val)
     end
