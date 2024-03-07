@@ -6,7 +6,7 @@ sy = display.screenOriginY + topInset
 sw = display.actualContentWidth - (leftInset + rightInset)
 sh = display.actualContentHeight - (topInset + bottomInset)
 
-tele_hint_size = nil
+tele_heading_size = nil
 
 ids = {}
 for i=0, 99 do

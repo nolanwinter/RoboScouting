@@ -127,6 +127,17 @@ function Inc_Dec.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, spac2
     self.height = self.bottom_y - self.top_y
     self.width = self.right_x - self.left_x
 
+    self.remove = function()
+        display.remove(self.id_text)
+        display.remove(self.id_minus)
+        display.remove(self.id_val_bkgd)
+        display.remove(self.id_val_text)
+        display.remove(self.id_plus)
+        for i=0,self.id_need-1 do
+            Data.ids[id+i] = false
+        end
+    end
+
     return self
 end
 
@@ -399,6 +410,9 @@ function SingleSelect.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, 
     self.remove = function()
         display.remove(self.select_text)
         display.remove(self.button_group)
+        for i=0,self.id_need-1 do
+            Data.ids[id+i]=false
+        end
     end
 
     return self
@@ -762,5 +776,63 @@ function PopUp.init(msg, msg_size, no_text, yes_text, button_size, handle_method
     self.option_line = display.newLine(self.popup_group, display.contentCenterX, self.yes_button.y, display.contentCenterX, self.yes_button.y + self.yes_button.height)
     self.option_line:setStrokeColor(0,0,0)
     self.option_line.strokeWidth = 2
+    return self
+end
+
+Alert = {}
+function Alert.init(msg, msg_size, ok_text, button_size)
+    local self = setmetatable({}, Alert)
+    self.sceneGroup = _sceneGroup
+    self.alert_group = display.newGroup()
+    self.sceneGroup:insert(self.alert_group)
+
+    self.tap_catcher = display.newRect(self.alert_group, display.contentCenterX, display.contentCenterY, display.actualContentWidth, display.actualContentHeight)
+    self.tap_catcher:setFillColor(0,0,0)
+    self.tap_catcher.alpha = 0.4
+    --self.tap_catcher.isHitTestable = true
+    self.tap_catcher:addEventListener("tap", function() return true end)
+
+    self.popup = display.newRoundedRect(self.alert_group, display.contentCenterX, display.contentCenterY, 1, 1, 1)
+    self.popup:setFillColor(1,1,1)
+    self.popup:setStrokeColor(0,0,0)
+    self.popup.strokeWidth = 4
+
+    self.message = display.newText({parent=self.alert_group, text=msg, x=display.contentCenterX, y=display.contentCenterY, font=native.systemFont, fontSize=msg_size, align="center"})
+    self.message:setFillColor(0,0,0)
+
+    self.ok_button = display.newRect(self.alert_group, display.contentCenterX, display.contentCenterY, 1, 1)
+    self.ok_button:setFillColor(0,0.2,1)
+    self.ok_button.alpha = 0
+    self.ok_button.isHitTestable = true
+    self.ok_button:addEventListener("tap", function() display.remove(self.alert_group) end)
+
+    self.ok_text = display.newText({parent=self.alert_group, text=ok_text, x=display.contentCenterX, y=display.contentCenterY, font=native.systemFont, fontSize=button_size, align="center"})
+    self.ok_text:setFillColor(0,0,0)
+
+    -- Popup dimensions
+    local horz_spac = 10
+    local vert_spac = 20
+    self.width = math.max(self.message.width + (2*horz_spac), self.ok_text.width + (2*horz_spac))
+    self.popup.width = self.width
+    self.height = self.message.height + self.ok_text.height + (4*vert_spac)
+    self.popup.height = self.height
+    self.popup.path.radius = math.floor(0.1*math.min(self.popup.width, self.popup.height))
+
+    -- Message placement
+    self.y_top = self.popup.y - (self.popup.height / 2)
+    self.x_left = self.popup.x - (self.popup.width / 2)
+    self.message.y = self.y_top + vert_spac
+    self.message.anchorY=0
+
+    -- Button placement
+    self.button_height = self.ok_text.height
+    self.ok_text.y = self.y_top + self.message.height + (3*vert_spac)
+    self.ok_text.anchorY=0
+    self.ok_text.x = display.contentCenterX
+    self.ok_button.height = self.button_height + (2*vert_spac)
+    self.ok_button.width = self.width
+    self.ok_button.y = self.y_top + self.message.height + (2*vert_spac)
+    self.ok_button.anchorY=0
+    self.ok_button.x = display.contentCenterX
     return self
 end

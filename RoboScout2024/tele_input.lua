@@ -70,54 +70,66 @@ function scene:create(event)
 	back_button:addEventListener("tap", go_back_screen)
 	submit_button:addEventListener("tap", submit_page)
 
-    local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=30 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
-	speaker_heading.anchorY=0
-	speaker_heading:setFillColor(0,0,0)
-	local speaker_made = Objects.Inc_Dec.init(40, "Speaker Shots Made","Made",15,80,10,5,5,5,30,23,20,0,10)
-	local speaker_miss = Objects.Inc_Dec.init(41, "Speaker Shots Miss","Missed",15,80,display.contentCenterX,5,5,5,30,23,20,0,10)
-
-	local amp_heading = display.newText({parent=sceneGroup,text="Amp Shots", x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
-	amp_heading.anchorY=0
-	amp_heading:setFillColor(0,0,0)
-	local amp_made = Objects.Inc_Dec.init(42, "Amp Shots Made","Made",15,150,10,5,5,5,30,23,20,0,10)
-	local amp_miss = Objects.Inc_Dec.init(43, "Amp Shots Miss","Missed",15,150,display.contentCenterX,5,5,5,30,23,20,0,10)
-
-	local trap_heading = display.newText({parent=sceneGroup,text="Trap Shots", x=display.contentCenterX,y=170 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
-	trap_heading.anchorY=0
-	trap_heading:setFillColor(0,0,0)
-	local trap_made = Objects.Inc_Dec.init(44, "Trap Shots Made","Made",15,220,10,5,5,5,30,23,20,0,3)
-	local trap_miss = Objects.Inc_Dec.init(45, "Trap Shots Miss","Missed",15,220,display.contentCenterX,5,5,5,30,23,20,0,99)
-
-	local hint_size = 0
-	if Data.tele_hint_size == nil then
-		hint_size = 15
+	local heading_size
+	if Data.tele_heading_size == nil then
+		heading_size = 25
 	else
-		hint_size = Data.tele_hint_size
+		heading_size = Data.tele_heading_size
 	end
 	local sized = false
 	while not sized do
-		local defense_report = Objects.SingleSelect.init(46, "Defense", "Defensive Rating", 20, 245, 10, 5, 1, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
-		defense_clarification_str = "If they primarily played defense, please\ninclude more information on the next page."
-		local defense_note = display.newText({parent=sceneGroup, text=defense_clarification_str, x=display.contentCenterX,y=defense_report.bottom_y + Data.sy + 3, font=native.systemFont, fontSize=hint_size, align="center"})
-		defense_note.anchorY=0
-		defense_note:setFillColor(0.2,0.2,0.2)
-		local endgame_report = Objects.SingleSelect.init(47, "Endgame", "Climb Result", 20, defense_note.y + defense_note.height + 5 - Data.sy, 10, 5, 1, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
-		harmony_clarification_str = "Single, Double, Triple climb above refers to\nthe number of robots on the same chain\nas the robot you are scouting."
-		local harmony_note = display.newText({parent=sceneGroup, text=harmony_clarification_str, x=display.contentCenterX,y=endgame_report.bottom_y + Data.sy + 3, font=native.systemFont, fontSize=hint_size, align="center"})
-		harmony_note.anchorY=0
-		harmony_note:setFillColor(0.5,0.5,0.5)
-		harm_note_bot_y = (harmony_note.y + harmony_note.height)
+		local speaker_heading = display.newText({parent=sceneGroup, text="Speaker Shots", x=display.contentCenterX,y=30 + Data.sy, font=native.systemFont, fontSize=heading_size, align="center"})
+		speaker_heading.anchorY=0
+		speaker_heading:setFillColor(0,0,0)
+		local speaker_made = Objects.Inc_Dec.init(40, "Speaker Shots Made","Made",15,speaker_heading.y+speaker_heading.height+20-Data.sy,10,5,5,5,30,23,20,0,99)
+		local speaker_miss = Objects.Inc_Dec.init(41, "Speaker Shots Miss","Missed",15,speaker_made.top_y+(speaker_made.height/2),display.contentCenterX,5,5,5,30,23,20,0,99)
+
+		local amp_heading = display.newText({parent=sceneGroup,text="Amp Shots", x=display.contentCenterX,y=speaker_made.bottom_y + 10 + Data.sy, font=native.systemFont, fontSize=heading_size, align="center"})
+		amp_heading.anchorY=0
+		amp_heading:setFillColor(0,0,0)
+		local amp_made = Objects.Inc_Dec.init(42, "Amp Shots Made","Made",15,amp_heading.y+amp_heading.height+20-Data.sy,10,5,5,5,30,23,20,0,99)
+		local amp_miss = Objects.Inc_Dec.init(43, "Amp Shots Miss","Missed",15,amp_made.top_y+(amp_made.height/2),display.contentCenterX,5,5,5,30,23,20,0,99)
+
+		local trap_heading = display.newText({parent=sceneGroup,text="Trap Shots", x=display.contentCenterX,y=amp_made.bottom_y + 10 + Data.sy, font=native.systemFont, fontSize=heading_size, align="center"})
+		trap_heading.anchorY=0
+		trap_heading:setFillColor(0,0,0)
+		local trap_made = Objects.Inc_Dec.init(44, "Trap Shots Made","Made",15,trap_heading.y+trap_heading.height+20-Data.sy,10,5,5,5,30,23,20,0,3)
+		local trap_miss = Objects.Inc_Dec.init(45, "Trap Shots Miss","Missed",15,trap_made.top_y+(trap_made.height/2),display.contentCenterX,5,5,5,30,23,20,0,99)
+
+		defense_clarification_str = "If they primarily played defense,\nplease include more information\non the next page."
+		harmony_clarification_str = "Single, Double, Triple climb refers to\nthe number of robots on the same chain\nas the robot you are scouting."
+		local defense_report = Objects.SingleSelect.init(46, "Defense", "Defensive Rating", 20, trap_made.bottom_y + 10, 10, 5, 1, 40, {"Did Not\nAttempt", "\nIneffective", "\nEffective"}, 15, 1, {"black", "red", "green"}, "Did Not\nAttempt")
+		local defense_text = defense_report.select_text
+		local defense_clarify = display.newImageRect(sceneGroup, asset_loc.."question_button.png",  defense_text.height, defense_text.height)
+		defense_clarify.anchorX = 0
+		defense_clarify.x = defense_text.x + (defense_text.width/2) + 7
+		defense_clarify.y = defense_text.y + (defense_text.height/2)
+		defense_clarify:addEventListener("tap", function() Objects.Alert.init(defense_clarification_str, 20, "OK", 20) end)
+
+		local endgame_report = Objects.SingleSelect.init(47, "Endgame", "Climb Result", 20, defense_report.bottom_y + 5, 10, 5, 1, 40, {"Did Not\nAttempt", "\nFailed", "Single\nClimb", "Double\nClimb", "Triple\nClimb"}, 15, 1, {"black", "red", "black", "black", "black"}, "Did Not\nAttempt")
+		local endgame_text = endgame_report.select_text
+		local endgame_clarify = display.newImageRect(sceneGroup, asset_loc.."question_button.png",  endgame_text.height, endgame_text.height)
+		endgame_clarify.anchorX = 0
+		endgame_clarify.x = endgame_text.x + (endgame_text.width/2) + 7
+		endgame_clarify.y = endgame_text.y + (endgame_text.height/2)
+		endgame_clarify:addEventListener("tap", function() Objects.Alert.init(harmony_clarification_str, 15, "OK", 20) end)
 		submit_top_y = (submit_button.y - submit_button.height)
-		print("Note bottom:"..tostring(harm_note_bot_y).." Button top:"..tostring(submit_top_y))
-		if (harm_note_bot_y > submit_top_y) then
-			print("Lowering hint size.")
-			hint_size = hint_size - 1
+		if (endgame_report.bottom_y > submit_top_y) then
+			print("Lowering heading size.")
+			heading_size = heading_size - 1
+			display.remove(speaker_heading)
+			speaker_made.remove()
+			speaker_miss.remove()
+			display.remove(amp_heading)
+			amp_made.remove()
+			amp_miss.remove()
+			display.remove(trap_heading)
+			trap_made.remove()
+			trap_miss.remove()
 			defense_report.remove()
-			display.remove(defense_note)
+			display.remove(defense_clarify)
 			endgame_report.remove()
-			display.remove(harmony_note)
-			Data.ids[46] = false
-			Data.ids[47] = false
+			display.remove(endgame_clarify)
 		else
 			Data.tele_hint_size = hint_size
 			sized = true

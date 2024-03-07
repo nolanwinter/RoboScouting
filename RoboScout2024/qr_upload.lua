@@ -10,7 +10,8 @@ local scene = composer.newScene()
 local captured_info
 local data_qr
 local popup
-local qr_size
+local next_match_top_y
+local qr_size = nil
 
 -- -----------------------
 -- Generic Event Functions
@@ -21,15 +22,15 @@ local function go_back_screen()
 end
 
 local function start_next_match()
-	composer.removeScene("match_info", true)
-	composer.removeScene("auto_input", true)
-	composer.removeScene("tele_input", true)
-	composer.removeScene("info_submit", true)
 	Data.match_num = Data.recorded_data[1] + 1
 	Data.scout_name = Data.recorded_data[98]
 	Data.team_to_scout = Data.teams_to_scout[Data.recorded_data[2]]
 	Data.update_qr_history()
 	Data.save_history()
+	composer.removeScene("match_info", true)
+	composer.removeScene("auto_input", true)
+	composer.removeScene("tele_input", true)
+	composer.removeScene("info_submit", true)
 	Data.recorded_data = {}
 	Data.ids = {}
 	-- REPLACED BY SETTING TO FALSE IN EACH SCENE DESTROY OPTION
@@ -81,7 +82,7 @@ function scene:create(event)
 	captured_info:setFillColor(0,0,0)
 	captured_info.anchorY=0
 
-	qr_size = math.min(Data.sw - 10, (next_match_button.y - next_match_button.height) - (captured_info.y + captured_info.height) - 10)
+	next_match_top_y = (next_match_button.y - next_match_button.height)
 
 	--next_match_button:addEventListener("tap", start_next_match)
 	next_match_button:addEventListener("tap", function() popup = Objects.PopUp.init("Are you sure you want to\nreset for a new match?", 15, "Cancel", "Continue", 15, handle_reset) end)
@@ -99,6 +100,9 @@ function scene:show( event )
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		captured_info.text=Data.get_readable_data_peak_vert()
 		captured_info.size=35
+		if qr_size == nil then
+			qr_size = math.min(Data.sw - 10, next_match_top_y - (captured_info.y + captured_info.height) - 10)
+		end
 		data_qr = Objects.QRCode.init(Data.get_data_short(), qr_size, (display.contentCenterX -(qr_size/2)), captured_info.y + captured_info.height + 5 - Data.sy)
 		Data.print_recorded_data()		
 	elseif ( phase == "did" ) then
