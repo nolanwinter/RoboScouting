@@ -1,0 +1,1 @@
+﻿RRScout2024 does not collect any user data. It doesn't even access any user data.
