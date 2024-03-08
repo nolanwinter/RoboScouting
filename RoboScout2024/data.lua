@@ -28,6 +28,8 @@ error_circle = {}
 
 scout_name = ""
 match_num = ""
+match_types = {"Qual", "Test"}
+match_type = "Qual"
 teams_to_scout = {"Red 1", "Red 2", "Red 3", "Blue 1", "Blue 2", "Blue 3"}
 team_to_scout = "Red 1"
 

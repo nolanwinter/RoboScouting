@@ -47,6 +47,7 @@ function scene:create(event)
     local link_str_1 = "https://github.com/speedata/luaqrcode"
     local info_str_2 = "All rights reserved.\n\nFor full copyright, see"
     local link_str_2 = "https://github.com/nolanwinter/\nRoboScouting/blob/main/README.md"
+    local version_str = "Version: "..system.getInfo("platform").." "..system.getInfo("appVersionString")
     local info_1 = display.newText({parent=sceneGroup, text=info_str_1, x=display.contentCenterX,y=100 + Data.sy, font=native.systemFont, fontSize=15, align="center"})
     info_1.anchorY=0
     info_1:setFillColor(0,0,0)
@@ -68,6 +69,9 @@ function scene:create(event)
     local link_2_line_lower = display.newLine(sceneGroup, link_2.x - (link_2.width/2), link_2.y + link_2.height, link_2.x + (link_2.width/2), link_2.y + link_2.height)
     link_2_line_lower:setStrokeColor(0.2,0.2,0.2)
     link_2_line_lower.strokeWidth=1
+    local ver_num = display.newText({parent=sceneGroup, text=version_str, x=display.contentCenterX,y=link_2.y+info_2.height + 20, font=native.systemFont, fontSize=15, align="center"})
+    ver_num.anchorY=0
+    ver_num:setFillColor(0,0,0)
     link_1:addEventListener("tap", function() system.openURL(link_str_1) end)
     link_2:addEventListener("tap", function() system.openURL(link_str_2) end)
 end

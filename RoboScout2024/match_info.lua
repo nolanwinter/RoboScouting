@@ -80,10 +80,10 @@ function scene:create(event)
 	info_button:addEventListener("tap", function() composer.gotoScene("info_page") end)
 
 	scout_name = Objects.SingleLineInput.init(98, "Scout Name", "Scout's name", 25, 80, 30, 10, 100, "Dr. Jerry", 15, tostring(Data.scout_name))
-	local match_type = Objects.SingleSelect.init(0,"Match type","Match Type",20,100,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},"Qual")
+	local match_type = Objects.SingleSelect.init(0,"Match type","Match Type",20,100,0,7,10,30,{"Qual","Test"},15,1,{"black","red"},Data.match_type)
 	match_num = Objects.FreeNumInput.init(1, "Match #","Match Number", 25, 220, 30, 15, 70, "0", 15, 0, 99,tonumber(Data.match_num))
-	local team_select = Objects.SingleSelect.init(2, "Team","Team Select", 25, 250, 0, 10, 10, 30, Data.teams_to_scout, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, Data.team_to_scout)
-	team_num = Objects.FreeNumInput.init(3, "Team #","Team Number", 25, team_select.bottom_y + 40, 30, 10, 100, "254", 15, 0, 9789,"")
+	team_num = Objects.FreeNumInput.init(3, "Team #","Team Number", 25, 270, 30, 10, 100, "254", 15, 0, 9789,"")
+	local team_select = Objects.SingleSelect.init(2, "Team","Team Select", 25, team_num.bottom_y + 15, 0, 10, 10, 30, Data.teams_to_scout, 15, 2, {"red", "red", "red", "blue", "blue", "blue"}, Data.team_to_scout)
 end
 
 -- show()

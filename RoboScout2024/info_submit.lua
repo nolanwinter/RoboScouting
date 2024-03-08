@@ -63,6 +63,9 @@ function scene:create(event)
 	back_button.x=5 + Data.sx
 	back_button.y=5 + Data.sy
 
+	local team_num = display.newText({parent=sceneGroup, text="Team #: "..tostring(Data.recorded_data[3] + Data.recorded_data[4]*100), x=display.contentCenterX,y=back_button.y + (back_button.height/2), font=native.systemFont, fontSize=17, align="center"})
+	team_num:setFillColor(0,0,0)
+
 	local submit_button = display.newImageRect(sceneGroup, asset_loc.."submit_button.png", 100, 50)
 	submit_button.anchorX=0.5
 	submit_button.anchorY=1

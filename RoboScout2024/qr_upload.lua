@@ -25,6 +25,7 @@ local function start_next_match()
 	Data.match_num = Data.recorded_data[1] + 1
 	Data.scout_name = Data.recorded_data[98]
 	Data.team_to_scout = Data.teams_to_scout[Data.recorded_data[2]]
+	Data.match_type = Data.match_types[Data.recorded_data[0]]
 	Data.update_qr_history()
 	Data.save_history()
 	composer.removeScene("match_info", true)
@@ -33,11 +34,6 @@ local function start_next_match()
 	composer.removeScene("info_submit", true)
 	Data.recorded_data = {}
 	Data.ids = {}
-	-- REPLACED BY SETTING TO FALSE IN EACH SCENE DESTROY OPTION
-	-- ids = {}
-	-- for i=0, 99 do
-	-- 	ids[i] = false
-	-- end
 	composer.gotoScene("match_info")
 	composer.removeScene("qr_upload", true)
 end
