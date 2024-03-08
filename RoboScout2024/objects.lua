@@ -419,7 +419,7 @@ function SingleSelect.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, 
 end
 
 TextInput = {}
-function TextInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size)
+function TextInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, textbox_height, text_hint, input_size, char_limit, char_limit_size)
     y_val = y_val + Data.sy
     lft_mrg = lft_mrg + Data.sx
     local self = setmetatable({}, TextInput)
@@ -444,8 +444,12 @@ function TextInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, tex
     self.text_input.width = display.contentWidth - (2*lft_mrg)
     self.text_input.isEditable=true
     self.text_input.size=input_size
-
     self.sceneGroup:insert(self.text_input)
+
+    self.char_limit_text = display.newText({parent=self.sceneGroup, text="0/"..tostring(char_limit), x=self.text_input.x + self.text_input.width, y=self.text_input.y - 1, font=native.systemFont, fontSize=char_limit_size, align="center"})
+    self.char_limit_text.anchorX=1
+    self.char_limit_text.anchorY=1
+    self.char_limit_text:setFillColor(0.1,0.1,0.1)
 
     self.debug_text = display.newText({parent=self.sceneGroup, text="", x=lft_mrg, y=0, font=native.systemFont, fontSize=12, align="left"})
     self.debug_text.anchorX=0
@@ -464,7 +468,16 @@ function TextInput.init(id, key, val_text, font_size, y_val, lft_mrg, spac1, tex
             data = string.gsub(data, "\n", " ")
             Data.recorded_data[id] = data
             self.debug_text.text=tostring(tostring(data))
-        elseif event.pahse == "submitted" then
+            local curr_char = string.len(event.text)
+            if curr_char >= char_limit then
+                curr_char = 180
+                self.text_input.text = string.sub(data, 1, char_limit)
+                self.char_limit_text:setFillColor(1,0,0)
+            else
+                self.char_limit_text:setFillColor(0.1,0.1,0.1)
+            end
+            self.char_limit_text.text = tostring(curr_char).."/"..tostring(char_limit)
+        elseif event.phase == "submitted" then
             native.setKeyboardFocus(nil)
         end
     end

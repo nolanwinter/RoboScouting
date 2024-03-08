@@ -72,7 +72,7 @@ function scene:create(event)
 	submit_button.x=display.contentCenterX
 	submit_button.y=Data.sh - 5 + Data.sy
 
-    text_input = Objects.TextInput.init(99,"Team notes","Any additional notes?\n(e.g. robot was disabled)\nLeave empty if there's\nnothing to add.", 20, 110, 10, 20, 250, "Test hint.", 18)
+    text_input = Objects.TextInput.init(99,"Team notes","Any additional notes?\n(e.g. robot was disabled)\nLeave empty if there's\nnothing to add.", 20, 110, 10, 20, 250, "Test hint.", 18, 180, 15)
 	back_button:addEventListener("tap", go_back_screen)
 	submit_button:addEventListener("tap", submit_page)
 end
