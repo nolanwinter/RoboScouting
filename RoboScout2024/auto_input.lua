@@ -82,7 +82,7 @@ function scene:create(event)
 	speaker_heading.anchorY=0
 	speaker_heading:setFillColor(0,0,0)
 	local speaker_made = Objects.Inc_Dec.init(21, "Auto Speaker Made","Made",15,290,10,5,5,5,35,23,20,0,99)
-	local speaker_miss = Objects.Inc_Dec.init(22, "Atuo Speaker Miss","Missed",15,290,display.contentCenterX,5,5,5,35,23,20,0,99)
+	local speaker_miss = Objects.Inc_Dec.init(22, "Auto Speaker Miss","Missed",15,290,display.contentCenterX,5,5,5,35,23,20,0,99)
 
 	local amp_heading = display.newText({parent=sceneGroup, text="Amp Shots", x=display.contentCenterX,y=320 + Data.sy, font=native.systemFont, fontSize=25, align="center"})
 	amp_heading.anchorY=0

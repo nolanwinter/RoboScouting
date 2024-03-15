@@ -1,4 +1,5 @@
---require "objects"
+require "objects"
+require "data"
 
 local asset_loc = "Assets/"
 
@@ -15,6 +16,7 @@ local scene = composer.newScene()
 
 function scene:create(event)
     local sceneGroup = self.view
+	Objects.set_scene_group(sceneGroup)
 
     local bckgnd_grad = {
         type = "gradient",
@@ -22,8 +24,14 @@ function scene:create(event)
         color2 = {0.42,0,0},
         direction="down"
     }
-    local background = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
-    background.fill = bckgnd_grad
+    local background_top = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY,display.actualContentWidth,display.actualContentHeight)
+    background_top:setFillColor(1,1,1)
+	local background_bottom = display.newRect(sceneGroup,display.contentCenterX,display.contentCenterY+(display.actualContentHeight/4),display.actualContentWidth,display.actualContentHeight/2)
+    background_bottom.fill = bckgnd_grad
+
+	Data.add_match_to_queue("12345")
+	Data.add_match_to_queue("12345678")
+	Data.send_match_to_server()
     
 end
 

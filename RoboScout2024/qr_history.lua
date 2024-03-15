@@ -55,7 +55,7 @@ local function show_next_qr(forward)
 	end
 	match_data = data_lines[3]
 	match_type = string.sub(match_data,3,4)
-	if match_type == 1 then
+	if tonumber(match_type) == 1 then
 		match_type = "Qual"
 	else
 		match_type = "Test"
