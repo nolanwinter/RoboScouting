@@ -415,6 +415,7 @@ function EditableMultiLineDisplay.init(val_text, font_size, y_val, lft_mrg, spac
 	self.text_display.size = display_size
     self.text_display.align = "center"
     self.text_display.isEditable = true
+    self.sceneGroup:insert(self.text_display)
 
     self.text_display_bckgd.x = self.text_display.x
     self.text_display_bckgd.y = self.text_display.y + (self.text_display.height/2)

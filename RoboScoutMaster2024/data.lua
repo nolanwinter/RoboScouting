@@ -19,13 +19,25 @@ function add_match_to_queue(match_data)
     match_num = match_num + 1
 end
 
+function queue_len()
+    return table.getn(match_queue)
+end
+
 function send_match_to_server()
     m = 1
     while m <= match_num do
-        client = assert(socket.connect(ip, port), "Connection failed.")
-        client:settimeout(20000)
+        client = socket.tcp()
+        client:settimeout(3)
+        connected, _ = client:connect(ip, port)
+        if connected == nil then
+            m  = m + 1
+        end
+        client:settimeout(5)
         print("Sending index "..tostring(m).." : "..tostring(match_queue[m]))
-        assert(client:send(match_queue[m]), "Send failed.")
+        sent = client:send(match_queue[m])
+        if sent == nil then
+            m = m + 1
+        end
         ack, err = client:receive('*a')
         if ack == match_queue[m] then
             match = table.remove(match_queue,m)

@@ -10,10 +10,12 @@ local match_type = nil
 local match_num = nil
 local team_pos_hint = nil
 local team_num = nil
+local add_notes
 local data_fields = {}
 local ids = {0,1,2,3,4,20,21,22,23,24,40,41,42,43,44,45,46,47,98,99}
 local match_data_table = {}
-local cleared = true
+local cleared = false
+local warning
 
 -- -----------------------
 -- Generic Event Functions
@@ -55,13 +57,7 @@ local function reset_data()
 	if not cleared then
 		for i,v in ipairs(data_fields) do
 			id = ids[i]
-			if id == 0 then
-				if match_data_table[0] == 1 then
-					v.update("Qual")
-				else
-					v.update("Test")
-				end
-			elseif id == 3 then
+			if id == 3 then
 				v.update(match_data_table[3] + match_data_table[4]*100)
 			elseif id == 4 then
 				do end
@@ -73,7 +69,7 @@ local function reset_data()
 end
 
 local function clear_input()
-	if not cleared then
+	if not cleared or data_in.line_input ~= "" then
 		data_in.line_input.text = ""
 		for i,v in ipairs(data_fields) do
 			v.clear()
@@ -94,7 +90,12 @@ local function submit_data()
 		data_string = string.sub(data_string, 1, -2)
 		print("Data to send:  "..data_string)
 		Data.add_match_to_queue(data_string)
-		Data.send_match_to_server()
+		success = Data.send_match_to_server()
+		if success then
+			warning.isVisible = false
+		else
+			warning.isVisible = true
+		end
 		clear_input()
 	end
 end
@@ -125,9 +126,11 @@ function scene:create(event)
 	back_button.y=5 + Data.sy
     back_button:addEventListener("tap", function() composer.gotoScene("main_screen") end)
 
-	-- local data_in = native.newTextField(display.contentCenterX, 50 + Data.sy, Data.sw - 30, 25)
-	-- data_in.anchorY = 0
-	-- data_in.size = 10
+	warning = display.newImageRect(sceneGroup, asset_loc.."error_icon.png", 30, 30)
+	warning.anchorX=1
+	warning.x = Data.sx + Data.sw - 10
+	warning.y = back_button.y + (back_button.height/2)
+	warning.isVisible = false
 
 	data_in = Objects.SingleLineInput.init("", 10, 50, 20, 0, Data.sw - 60, "Match Data", 12, true)
 
@@ -232,6 +235,7 @@ function scene:show( event )
 	if ( phase == "will" ) then
 		-- Code here runs when the scene is still off screen (but is about to come on screen)
 		data_in.line_input.isVisible = true
+		add_notes.text_display.isVisible = true
 		match_type.edit(false)
 		match_num.edit(false)
 	elseif ( phase == "did" ) then
@@ -252,6 +256,7 @@ function scene:hide( event )
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
 		data_in.line_input.isVisible = false
+		add_notes.text_display.isVisible = false
 	end
 end
 
